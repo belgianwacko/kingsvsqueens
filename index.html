@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kings vs Queens — Logic Puzzle</title>
+<meta name="description" content="A challenging logic puzzle: place 8 Queens and 2 Kings on an 8×8 grid. Free to play, no signup required.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f172a;--card:#1e293b;--border:#334155;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+  --gold:#f59e0b;--gold-dim:rgba(245,158,11,.12);--gold-glow:rgba(245,158,11,.25);
+  --green:#16a34a;
+  --rose:#EE6677;--orange:#EE7733;--sand:#CCBB44;--green-e:#228833;
+  --blue:#4477AA;--purple:#AA3377;--cyan:#66CCEE;--teal:#44AA99;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;line-height:1.6;min-height:100vh;overflow-x:hidden}
+
+.hero{text-align:center;padding:60px 24px 40px;position:relative}
+.hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,var(--gold-dim) 0%,transparent 70%);pointer-events:none;z-index:0}
+.crown{font-size:64px;display:block;margin-bottom:12px;position:relative;z-index:1;animation:crownFloat 3s ease-in-out infinite}
+@keyframes crownFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+h1{font-family:'DM Serif Display',serif;font-size:clamp(32px,7vw,52px);color:var(--gold);position:relative;z-index:1;letter-spacing:-.5px}
+.tagline{color:var(--text2);font-size:clamp(15px,3.5vw,18px);margin-top:8px;position:relative;z-index:1}
+
+.play-btn-wrap{text-align:center;margin:36px 0 48px;position:relative;z-index:1}
+.play-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--gold);color:#0f172a;
+  font-family:'DM Sans',sans-serif;font-weight:600;font-size:18px;
+  padding:16px 40px;border-radius:14px;border:none;cursor:pointer;
+  text-decoration:none;
+  box-shadow:0 0 30px var(--gold-glow),0 4px 16px rgba(0,0,0,.3);
+  transition:all .2s ease;
+}
+.play-btn:hover{transform:translateY(-2px);box-shadow:0 0 50px var(--gold-glow),0 8px 24px rgba(0,0,0,.4)}
+.play-btn:active{transform:translateY(0)}
+
+.content{max-width:600px;margin:0 auto;padding:0 24px 60px}
+
+.section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px 24px;margin-bottom:20px}
+.section h2{font-family:'DM Serif Display',serif;font-size:22px;color:var(--gold);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.section h3{font-size:15px;font-weight:600;color:var(--text);margin:18px 0 8px;display:flex;align-items:center;gap:8px}
+.section h3:first-of-type{margin-top:4px}
+.section p{color:var(--text2);font-size:14.5px;margin-bottom:8px}
+.section ul{list-style:none;padding:0}
+.section li{color:var(--text2);font-size:14px;padding:5px 0 5px 20px;position:relative}
+.section li::before{content:'›';position:absolute;left:4px;color:var(--gold);font-weight:bold}
+
+.piece-queen{color:var(--gold);font-weight:600}
+.piece-king{color:var(--text);font-weight:600}
+.gray-cell{color:#9ca3af;font-weight:600}
+
+.grid-preview{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;width:min(280px,70vw);margin:20px auto;border-radius:8px;overflow:hidden}
+.grid-preview .cell{aspect-ratio:1;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:clamp(12px,3vw,18px)}
+.grid-preview .cell.gray{background:repeating-linear-gradient(45deg,#374151,#374151 3px,#4b5563 3px,#4b5563 6px)}
+
+.tip{background:var(--gold-dim);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:14px 16px;margin-top:16px;font-size:13.5px;color:var(--text2)}
+.tip b{color:var(--gold)}
+
+.controls-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.ctrl{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center}
+.ctrl .action{font-size:13px;font-weight:600;color:var(--text)}
+.ctrl .result{font-size:12px;color:var(--text3);margin-top:2px}
+
+.footer{text-align:center;padding:20px 24px 40px;color:var(--text3);font-size:12px}
+.footer a{color:var(--text2);text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <span class="crown">👑</span>
+  <h1>Kings vs Queens</h1>
+  <p class="tagline">A logic puzzle of placement, elimination & deduction</p>
+</div>
+
+<div class="play-btn-wrap">
+  <a href="kingsvsqueens.html" class="play-btn">♛ Play Now</a>
+</div>
+
+<div class="content">
+  <div class="section">
+    <h2>👑 How to Play</h2>
+    <p>Fill an 8×8 board by placing <span class="piece-queen">8 Queens</span> and <span class="piece-king">2 Kings</span>. Each puzzle has exactly one solution.</p>
+
+    <h3>♛ Queens</h3>
+    <ul>
+      <li>Place one queen in each <b>colored region</b> (estate).</li>
+      <li>No two queens may share the same <b>row</b> or <b>column</b>.</li>
+      <li>Queens cannot be <b>adjacent</b> to each other (including diagonals) — but they <em>can</em> share a long diagonal.</li>
+    </ul>
+
+    <h3>♚ Kings</h3>
+    <ul>
+      <li>Both kings go on <span class="gray-cell">gray cells</span> only.</li>
+      <li>Kings cannot be <b>adjacent to</b> or on the <b>same diagonal</b> as any queen (at any distance).</li>
+      <li>Kings cannot share a <b>row, column, or diagonal</b> with each other.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🎮 Controls</h2>
+    <div class="controls-grid">
+      <div class="ctrl">
+        <div class="action">Tap</div>
+        <div class="result">Place a cross ✕</div>
+      </div>
+      <div class="ctrl">
+        <div class="action">Double-tap</div>
+        <div class="result">♛ or ♚ piece</div>
+      </div>
+      <div class="ctrl">
+        <div class="action">Hold</div>
+        <div class="result">Show attack zones</div>
+      </div>
+      <div class="ctrl">
+        <div class="action">Drag</div>
+        <div class="result">Multi-cross</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>💡 Hints</h2>
+    <p>Stuck? Tap the <b style="color:var(--gold)">Hint</b> button — it won't just tell you the answer, it'll explain <em>why</em>.</p>
+    <ul>
+      <li>Each tap reveals a little more: first a <b>nudge</b>, then the <b>reasoning</b>, then the <b>answer</b>.</li>
+      <li>Hints walk you through the exact logic — which cells conflict, which estates are confined, what chain of deductions leads to the elimination.</li>
+      <li>For longer chains, steps are revealed <b>one at a time</b> so you can follow along.</li>
+    </ul>
+    <div class="tip">💡 <b>Don't be afraid to use hints!</b> They act as an in-game tutorial — each one teaches you a solving technique you can apply on your own next time.</div>
+  </div>
+
+  <div class="section">
+    <h2>📊 Difficulty</h2>
+    <p>25 handcrafted puzzles across five tiers — from gentle introductions to fiendish chain-reasoning challenges.</p>
+    <ul>
+      <li><b>Beginner</b> — queens can be placed without using king logic</li>
+      <li><b>Easy</b> — kings are necessary to solve the full puzzle but are still fairly trivial</li>
+      <li><b>Medium</b> — more complex interaction between kings and queens</li>
+      <li><b>Hard</b> — long deduction chains, set logic</li>
+      <li><b>Expert</b> — deep chains, king pairing traps, cascade reasoning</li>
+    </ul>
+  </div>
+
+  <div class="play-btn-wrap" style="margin:32px 0 20px">
+    <a href="kingsvsqueens.html" class="play-btn">♛ Start Playing</a>
+  </div>
+</div>
+
+<div class="footer">
+  © 2026 All rights reserved.
+</div>
+
+<script data-goatcounter="https://kingsvsqueens.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
