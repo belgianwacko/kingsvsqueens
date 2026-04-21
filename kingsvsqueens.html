@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kings Vs Queens: demo version</title>
+<title>Estate Puzzle V6</title>
 <style>
 /* ═══ THEME VARIABLES ═══ */
 :root{
@@ -6467,13 +6467,20 @@ function tutOnHintCompleted(){
 loadProgress();
 renderSelector();
 initTheme();
-// Auto-load first puzzle
-const initCodes = PUZZLES[currentDiff] || [];
-if (initCodes.length > 0) loadPuzzle(currentDiff, 0);
-// First-visit tutorial prompt
-try{if(!localStorage.getItem("kvq-tutorial-done")){
-  setTimeout(()=>{if(!tutorialMode)startTutorial()},300);
-}}catch(e){}
+// URL parameters: ?d=Beginner&p=1 (1-indexed)
+{const params=new URLSearchParams(window.location.search);
+const urlDiff=params.get("d"),urlPuz=params.get("p");
+if(urlDiff&&PUZZLES[urlDiff]&&urlPuz){
+  const pi=parseInt(urlPuz)-1;
+  if(pi>=0&&pi<PUZZLES[urlDiff].length){loadPuzzle(urlDiff,pi)}
+  else{const ic=PUZZLES[currentDiff]||[];if(ic.length>0)loadPuzzle(currentDiff,0)}
+}else{
+  const ic=PUZZLES[currentDiff]||[];if(ic.length>0)loadPuzzle(currentDiff,0);
+  // First-visit tutorial prompt
+  try{if(!localStorage.getItem("kvq-tutorial-done")){
+    setTimeout(()=>{if(!tutorialMode)startTutorial()},300);
+  }}catch(e){}
+}}
 </script>
 </body>
 </html>
