@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Kings vs Queens demo</title>
+<title>Kings vs Queens v8</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 
 /* ═══ DESIGN TOKENS ═══ */
 :root {
-  --cell:min(calc((100vw - 44px)/8),62px);--gap:0px;--grid-w:calc(var(--cell)*8);
+  --cell:min(calc((100vw - 28px)/8),62px);--gap:0px;--grid-w:calc(var(--cell)*8);
   --ink:#131110;--s0:#1a1816;--s1:#211f1b;--s2:#2c2820;--s3:#38322a;
   --b0:#302a22;--b1:#44392e;--b2:#58493a;
   --t0:#eae3d6;--t1:#b8ae9e;--t2:#887e6e;--t3:#5e564a;
@@ -140,39 +140,63 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;o
 .status-strip .kc{color:var(--t1)}
 
 /* ═══ BOARD ═══ */
-.board-wrap{display:flex;align-items:center;justify-content:center;padding:4px 8px;flex-shrink:0}
+.board-wrap{display:flex;align-items:center;justify-content:center;padding:4px 2px;flex-shrink:0}
 .board-outer{display:inline-block;position:relative}
-.col-lbl{display:grid;grid-template-columns:repeat(8,var(--cell));margin-left:16px;margin-bottom:1px}
+.col-lbl{display:grid;grid-template-columns:repeat(8,var(--cell));margin-left:12px;margin-bottom:1px}
 .col-lbl span{text-align:center;font-size:9px;color:var(--t2);font-weight:500;letter-spacing:.06em;display:flex;align-items:center;justify-content:center}
 .row-wrap{display:flex}
-.row-lbl{display:grid;grid-template-rows:repeat(8,var(--cell));width:14px;margin-right:2px}
-.row-lbl span{display:flex;align-items:center;justify-content:flex-end;padding-right:2px;font-size:9px;color:var(--t2);font-weight:500}
+.row-lbl{display:grid;grid-template-rows:repeat(8,var(--cell));width:10px;margin-right:1px}
+.row-lbl span{display:flex;align-items:center;justify-content:flex-end;padding-right:1px;font-size:8px;color:var(--t2);font-weight:500}
 
 .grid{display:inline-grid;grid-template-columns:repeat(8,var(--cell));gap:0;
   touch-action:none;
-  border:2px solid var(--grid-border);
-  box-shadow:0 4px 20px rgba(0,0,0,.35),0 1px 3px rgba(0,0,0,.25)}
+  border:3px solid var(--copper);
+  box-shadow:0 0 0 1px rgba(0,0,0,.3),0 4px 20px rgba(0,0,0,.35),0 1px 3px rgba(0,0,0,.25)}
 .cell{width:var(--cell);height:var(--cell);display:flex;align-items:center;justify-content:center;
   cursor:pointer;position:relative;user-select:none;
   font-size:clamp(14px,calc(var(--cell)*.44),24px);transition:filter .06s;
-  border-right:1px solid rgba(0,0,0,.12);border-bottom:1px solid rgba(0,0,0,.12)}
+  border-right:1px solid rgba(0,0,0,.12);border-bottom:1px solid rgba(0,0,0,.12);
+  overflow:hidden}
 .cell:hover{filter:brightness(1.1)}
-.cell[data-e="8"]{background:var(--egray);
-  background-image:repeating-linear-gradient(135deg,transparent,transparent 3px,rgba(255,255,255,.04) 3px,rgba(255,255,255,.04) 6px)}
-/* Gray cell grid lines need to be lighter */
-.cell[data-e="8"]{border-right-color:rgba(255,255,255,.08);border-bottom-color:rgba(255,255,255,.08)}
 
-/* Region borders — thicker, darker where estates differ */
-.cell.rb{border-right:2px solid var(--region-border)}
-.cell.bb{border-bottom:2px solid var(--region-border)}
+/* Colored cell texture: C+F (inner glow + parchment grain) */
+.cell:not([data-e="8"])::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:radial-gradient(ellipse at 30% 30%, rgba(255,255,255,.15) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 50%, transparent 35%, rgba(0,0,0,.1) 100%)}
+.cell:not([data-e="8"])::after{content:'';position:absolute;inset:0;pointer-events:none;opacity:.07;z-index:2;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:120px}
+
+/* Gray cells: E+B (warm bright base + seamless stripes via grid-origin pseudo + copper tint + grain) */
+.cell[data-e="8"]{background-color:#484440}
+.cell[data-e="8"]::before{content:'';position:absolute;pointer-events:none;z-index:1;
+  /* Position relative to grid origin using CSS vars set in JS */
+  left:calc(var(--cell) * var(--gc) * -1);
+  top:calc(var(--cell) * var(--gr) * -1);
+  width:calc(var(--cell) * 8 + 14px);
+  height:calc(var(--cell) * 8 + 14px);
+  background:
+    repeating-linear-gradient(135deg,transparent,transparent 3px,rgba(255,255,255,.07) 3px,rgba(255,255,255,.07) 6px),
+    radial-gradient(ellipse at 50% 50%, rgba(196,149,106,.05) 0%, transparent 70%)}
+.cell[data-e="8"]::after{content:'';position:absolute;inset:0;pointer-events:none;opacity:.1;z-index:2;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:120px}
+/* Gray cell grid lines — brighter */
+.cell[data-e="8"]{border-right-color:rgba(255,255,255,.18);border-bottom-color:rgba(255,255,255,.18)}
+
+/* Region borders — copper, matching grid frame */
+.cell.rb{border-right:2px solid var(--copper)}
+.cell.bb{border-bottom:2px solid var(--copper)}
 
 /* Pieces */
-.pc{line-height:1;position:relative;z-index:2;pointer-events:none}
-.queen-pc{color:#f7eed8;font-size:clamp(16px,calc(var(--cell)*.5),28px);
-  text-shadow:0 1px 2px rgba(0,0,0,.5),-1px 0 0 rgba(0,0,0,.4),1px 0 0 rgba(0,0,0,.4)}
-.king-pc{color:var(--king-color);font-size:clamp(16px,calc(var(--cell)*.5),28px);
+.pc{line-height:1;position:relative;z-index:3;pointer-events:none;
+  font-family:'Segoe UI Symbol','Apple Color Emoji','Noto Sans Symbols 2',serif;
+  -webkit-text-size-adjust:100%;text-size-adjust:100%}
+.queen-pc{color:var(--copper);font-size:clamp(18px,calc(var(--cell)*.575),32px);
   text-shadow:0 1px 2px rgba(0,0,0,.5)}
-.cross-pc{color:var(--cross-estate);font-weight:700;font-size:clamp(14px,calc(var(--cell)*.38),20px)}
+.king-pc{color:var(--king-color);font-size:clamp(18px,calc(var(--cell)*.575),32px);
+  text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.cross-pc{color:var(--cross-estate);font-weight:700;font-size:clamp(20px,calc(var(--cell)*.53),28px)}
 .cell[data-e="8"] .cross-pc{color:var(--cross-castle)}
 
 /* Highlights */
@@ -1580,6 +1604,8 @@ function renderBoard(){
     const d=document.createElement("div");d.className="cell";
     d.setAttribute("data-e",rid);
     if(rid!==CID)d.style.background=clr;
+    // Set grid position vars for seamless gray cell stripes
+    if(rid===CID){d.style.setProperty('--gr',r);d.style.setProperty('--gc',c);}
     // Region borders
     if(c<7&&R2[i]!==R2[i+1])d.classList.add("rb");
     if(r<7&&R2[i]!==R2[idx(r+1,c)])d.classList.add("bb");
