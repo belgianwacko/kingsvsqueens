@@ -2,80 +2,196 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Estate Puzzle V6</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Kings vs Queens v8</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ═══ THEME VARIABLES ═══ */
-:root{
-  --cell:min(calc((100vw - 50px)/8),56px);--gap:2px;--grid-w:calc(var(--cell)*8 + var(--gap)*7);
-  /* Dark theme (default) */
-  --bg-primary:#0f172a;--bg-card:#1e293b;--bg-hover:#334155;
-  --border-subtle:#334155;--border-mid:#475569;
-  --text-primary:#e2e8f0;--text-secondary:#94a3b8;--text-muted:#64748b;
-  --accent:#f59e0b;--accent-dim:#f59e0b22;--accent-glow:rgba(245,158,11,.15);
-  --success:#16a34a;--success-dim:#16a34a22;
-  --danger:#ef4444;--danger-dim:#ef444422;
-  --btn-undo:#475569;--btn-clear:#7f1d1d;--btn-hint:#f59e0b;--btn-check:#0f766e;
-  --btn-hint-text:#fff;--btn-check-text:#fff;--king-color:#e2e8f0;
+
+/* ═══ DESIGN TOKENS ═══ */
+:root {
+  --cell:min(calc((100vw - 44px)/8),62px);--gap:0px;--grid-w:calc(var(--cell)*8);
+  --ink:#131110;--s0:#1a1816;--s1:#211f1b;--s2:#2c2820;--s3:#38322a;
+  --b0:#302a22;--b1:#44392e;--b2:#58493a;
+  --t0:#eae3d6;--t1:#b8ae9e;--t2:#887e6e;--t3:#5e564a;
+  --copper:#c4956a;--copper-l:#d8ad80;--copper-dim:rgba(196,149,106,.10);--copper-glow:rgba(196,149,106,.25);
+  --green:#6a9e6a;--green-dim:rgba(106,158,106,.10);
+  --red:#b85c5c;--red-dim:rgba(184,92,92,.10);
+  --egray:#3a3630;
+  --region-border:rgba(0,0,0,.5);--region-w:2px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --king-color:#eae3d6;
+  --accent:#c4956a;--accent-dim:rgba(196,149,106,.10);--accent-glow:rgba(196,149,106,.15);
+  --success:#6a9e6a;--success-dim:rgba(106,158,106,.10);
+  --danger:#b85c5c;--danger-dim:rgba(184,92,92,.10);
+  --bg-primary:#1a1816;--bg-card:#211f1b;--bg-hover:#2c2820;
+  --border-subtle:#302a22;--border-mid:#44392e;
+  --text-primary:#eae3d6;--text-secondary:#b8ae9e;--text-muted:#5e564a;
+  --overlay-bg:rgba(0,0,0,.6);
   --shadow-sm:0 1px 3px rgba(0,0,0,.3);--shadow-md:0 4px 12px rgba(0,0,0,.25);
-  --cross-estate:rgba(0,0,0,.32);--cross-castle:rgba(255,255,255,.52);
-  --grid-border:#475569;--grid-bg:#1e293b;
-  --overlay-bg:rgba(0,0,0,.75)
+  --cross-estate:rgba(0,0,0,.28);--cross-castle:rgba(255,255,255,.28);
+  --grid-border:#44392e;--grid-bg:#1a1816;
+  --serif:'Crimson Pro',Georgia,serif;--sans:'Outfit',system-ui,sans-serif;
 }
 [data-theme="light"]{
-  --bg-primary:#b8c4ce;--bg-card:#ffffff;--bg-hover:#e2e8f0;
-  --border-subtle:#e2e8f0;--border-mid:#cbd5e1;
-  --text-primary:#1e293b;--text-secondary:#475569;--text-muted:#94a3b8;
-  --accent:#d97706;--accent-dim:#d9770622;--accent-glow:rgba(217,119,6,.1);
-  --success:#16a34a;--success-dim:#16a34a18;
-  --danger:#dc2626;--danger-dim:#dc262618;
-  --btn-undo:#5eaaa8;--btn-clear:#b91c1c;--btn-hint:#d97706;--btn-check:#0d9488;--king-color:#fff;
-  --btn-hint-text:#fff;--btn-check-text:#fff;--king-color:#e2e8f0;
-  --shadow-sm:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 12px rgba(0,0,0,.1);
-  --cross-estate:rgba(0,0,0,.3);--cross-castle:rgba(255,255,255,.55);
-  --grid-border:#94a3b8;--grid-bg:#2d3748;
-  --overlay-bg:rgba(0,0,0,.5)
+  --ink:#d0ccc6;--s0:#e8e4dc;--s1:#f2efe8;--s2:#ddd9d2;--s3:#cec8c0;
+  --b0:#c4beb6;--b1:#a89e94;--b2:#8a7e72;
+  --t0:#1a1714;--t1:#44392e;--t2:#6e6458;--t3:#a89e90;
+  --copper:#a07040;--copper-l:#b88050;--copper-dim:rgba(160,112,64,.10);--copper-glow:rgba(160,112,64,.2);
+  --green:#4a7a4a;--green-dim:rgba(74,122,74,.10);
+  --red:#a04848;--red-dim:rgba(160,72,72,.10);
+  --egray:#b8b4ae;
+  --region-border:rgba(0,0,0,.3);
+  --king-color:#1a1714;
+  --accent:#a07040;--accent-dim:rgba(160,112,64,.10);--accent-glow:rgba(160,112,64,.1);
+  --bg-primary:#e8e4dc;--bg-card:#f2efe8;--bg-hover:#ddd9d2;
+  --border-subtle:#c4beb6;--border-mid:#a89e94;
+  --text-primary:#1a1714;--text-secondary:#44392e;--text-muted:#a89e90;
+  --overlay-bg:rgba(0,0,0,.4);
+  --cross-estate:rgba(0,0,0,.25);--cross-castle:rgba(0,0,0,.3);
+  --grid-border:#a89e94;--grid-bg:#e8e4dc;
 }
 
 /* ═══ BASE ═══ */
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,sans-serif;background:var(--bg-primary);color:var(--text-primary);padding:10px;max-width:100vw;overflow-x:hidden;transition:background .3s,color .3s}
-.wrapper{max-width:calc(var(--grid-w) + 36px);margin:0 auto}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--sans);background:var(--ink);color:var(--t0);-webkit-font-smoothing:antialiased;transition:background .3s,color .3s;
+  display:flex;align-items:center;justify-content:center}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.028;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:150px}
 
-/* ═══ TITLE ROW ═══ */
-.title-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
-.title-row h1{color:var(--accent);font-size:18px;white-space:nowrap;font-weight:800;letter-spacing:-.3px}
-.rules-btn{padding:4px 12px;border-radius:20px;border:1.5px solid var(--accent);cursor:pointer;font-family:inherit;font-size:10px;font-weight:600;background:var(--accent-dim);color:var(--accent);white-space:nowrap;transition:all .2s;backdrop-filter:blur(4px)}
-.rules-btn:hover{background:var(--accent);color:#000;box-shadow:0 0 12px var(--accent-glow)}
-.theme-toggle{margin-left:auto;background:none;border:1.5px solid var(--border-mid);border-radius:20px;padding:4px 10px;cursor:pointer;font-size:14px;color:var(--text-secondary);transition:all .2s;line-height:1}
-.theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.app{width:100%;height:100%;position:relative;overflow:hidden}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;
+  transition:transform .4s cubic-bezier(.4,0,.2,1),opacity .35s ease;
+  will-change:transform,opacity;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--s0)}
+.screen.off-r{transform:translateX(100%);opacity:0;pointer-events:none}
+.screen.off-l{transform:translateX(-30%);opacity:.4;pointer-events:none}
+.screen.on{transform:translateX(0);opacity:1}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--b0);border-radius:2px}
 
-/* ═══ RULES MODAL ═══ */
-.rules-overlay{display:none;position:fixed;inset:0;background:var(--overlay-bg);z-index:200;justify-content:center;align-items:center;padding:16px;backdrop-filter:blur(4px)}
-.rules-overlay.show{display:flex}
-.rules-box{background:var(--bg-card);border:2px solid var(--accent);border-radius:16px;padding:24px;max-width:420px;width:100%;max-height:85vh;overflow-y:auto;position:relative;box-shadow:var(--shadow-md)}
-.rules-box h2{color:var(--accent);font-size:16px;margin-bottom:10px;font-weight:700}
-.rules-box h3{color:var(--accent);font-size:12px;margin:10px 0 4px;font-weight:700;opacity:.85}
-.rules-box p,.rules-box li{color:var(--text-secondary);font-size:11px;line-height:1.6}
-.rules-box ul{padding-left:18px;margin:4px 0 8px}
-.rules-box li{margin-bottom:3px}
-.rules-close{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;padding:4px;transition:color .2s}
-.rules-close:hover{color:var(--text-primary)}
-.rules-tip{background:var(--accent-dim);border-left:3px solid var(--accent);padding:8px 10px;border-radius:0 8px 8px 0;margin-top:10px;font-size:10px;color:var(--accent);line-height:1.5}
+/* ═══ SELECT SCREEN ═══ */
+.sel-head{padding:40px 24px 16px;text-align:center}
+.sel-crown{width:32px;height:32px;margin:0 auto 10px;opacity:.6}
+.sel-crown svg{width:100%;height:100%}
+.sel-title{font-family:var(--serif);font-size:24px;font-weight:700;letter-spacing:-.02em}
+.sel-title span{color:var(--copper)}
+.sel-sub{color:var(--t2);font-size:11px;margin-top:3px;font-weight:300;letter-spacing:.04em}
 
-/* ═══ BUTTONS ═══ */
-button{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-size:11px;font-weight:600;transition:all .15s;box-shadow:var(--shadow-sm)}
-button:hover{filter:brightness(1.1);box-shadow:var(--shadow-md)}
-button:active{transform:scale(0.96);box-shadow:none}
+.tier-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:12px 16px 0;margin-top:12px}
+.ttab{font-family:var(--sans);background:var(--s1);border:1px solid var(--b0);
+  color:var(--t2);border-radius:8px;cursor:pointer;
+  padding:8px 4px 6px;text-align:center;transition:all .15s}
+.ttab:hover{border-color:var(--b2);background:var(--s2)}
+.ttab.on{border-color:var(--copper);color:var(--copper);background:var(--copper-dim)}
+.ttab .tname{font-size:11px;font-weight:600;display:block;letter-spacing:.02em}
+.ttab .cnt{font-size:9px;color:var(--t3);display:block;margin-top:2px;font-weight:400}
+.ttab.on .cnt{color:var(--copper)}
 
-/* ═══ GRID ═══ */
-.grid{display:inline-grid;grid-template-columns:repeat(8,var(--cell));gap:var(--gap);background:var(--grid-bg);border:3px solid var(--grid-border);touch-action:none;border-radius:4px;overflow:hidden}
-.cell{width:var(--cell);height:var(--cell);display:flex;align-items:center;justify-content:center;font-size:clamp(14px,calc(var(--cell)*0.45),24px);cursor:pointer;position:relative;user-select:none;transition:filter .1s}
-.cell:hover{filter:brightness(1.2)}
-.cell.hint-target{box-shadow:inset 0 0 0 4px #ffffff,0 0 8px 2px rgba(255,255,255,.6);z-index:3;animation:hintPulse 1.2s ease-in-out infinite}
-@keyframes hintPulse{0%,100%{box-shadow:inset 0 0 0 4px #ffffff,0 0 8px 2px rgba(255,255,255,.6)}50%{box-shadow:inset 0 0 0 4px rgba(255,255,255,.7),0 0 4px 1px rgba(255,255,255,.3)}}
+.puz-grid{padding:12px 20px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.puz-btn{height:36px;border-radius:7px;border:1px solid var(--b0);background:var(--s1);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .12s;
+  position:relative;font-size:13px;font-weight:600;color:var(--t2);font-family:var(--serif)}
+.puz-btn:hover{border-color:var(--b2);background:var(--s2)}
+.puz-btn.active{border-color:var(--copper);color:var(--copper);background:var(--copper-dim);box-shadow:0 0 0 1px var(--copper)}
+.puz-btn.solved{border-color:rgba(106,158,106,.25);color:var(--green)}
+.puz-btn.solved::after{content:'✓';position:absolute;top:-3px;right:-2px;
+  width:12px;height:12px;background:var(--green);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:7px;color:var(--ink);font-weight:700;font-family:var(--sans);
+  box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.progress-bar{height:3px;background:var(--s2);border-radius:2px;margin:8px 20px 0;overflow:hidden}
+.progress-fill{height:100%;background:var(--green);border-radius:2px;transition:width .3s}
+.progress-text{font-size:10px;color:var(--t3);margin:4px 20px 0;text-align:right}
 
-/* ═══ GHOST OVERLAYS ═══ */
+.sel-bottom{padding:12px 20px calc(14px + var(--safe-b));border-top:1px solid var(--b0);
+  display:flex;align-items:center;gap:12px;margin-top:16px}
+.sel-play{padding:11px 18px;background:var(--copper);color:var(--ink);
+  border:none;border-radius:10px;font-family:var(--sans);font-size:13px;font-weight:600;
+  cursor:pointer;transition:all .15s;box-shadow:0 2px 12px var(--copper-glow);
+  display:flex;align-items:center;gap:6px;letter-spacing:.02em;margin-left:auto}
+.sel-play:hover{background:var(--copper-l)}
+.sel-play:active{transform:scale(.97)}
+.sel-play svg{width:14px;height:14px}
+
+/* ═══ PLAY SCREEN ═══ */
+/* ═══ PLAY SCREEN ═══ */
+.play-screen{display:flex;flex-direction:column;overflow-y:auto}
+.topbar{display:flex;align-items:center;padding:8px 10px;gap:6px;flex-shrink:0;position:sticky;top:0;z-index:10;background:var(--s0)}
+.btn-back{background:none;border:none;color:var(--t2);cursor:pointer;
+  width:30px;height:30px;display:flex;align-items:center;justify-content:center;
+  border-radius:6px;transition:all .12s;flex-shrink:0}
+.btn-back:hover{background:var(--s2);color:var(--t0)}
+.btn-back svg{width:16px;height:16px}
+.play-id{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--t1)}
+.play-id .tn{color:var(--copper)}
+.top-timer{font-size:11px;color:var(--t3);font-weight:500;font-variant-numeric:tabular-nums;margin-left:auto}
+.top-sep{width:1px;height:10px;background:var(--b0);flex-shrink:0}
+.top-ct{font-size:11px;font-weight:500}
+.top-ct.qc{color:#d4be8a}
+.top-ct.kc{color:var(--t1)}
+.btn-theme{background:none;border:1px solid var(--b1);color:var(--t3);font-size:12px;
+  width:28px;height:28px;border-radius:6px;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;transition:all .15s;line-height:1;flex-shrink:0;margin-left:4px}
+.btn-theme:hover{border-color:var(--copper);color:var(--copper)}
+.status-strip .timer{font-variant-numeric:tabular-nums;min-width:36px;text-align:center}
+.status-strip .sep{width:1px;height:10px;background:var(--b0)}
+.status-strip .qc{color:#d4be8a}
+.status-strip .kc{color:var(--t1)}
+
+/* ═══ BOARD ═══ */
+.board-wrap{display:flex;align-items:center;justify-content:center;padding:4px 8px;flex-shrink:0}
+.board-outer{display:inline-block;position:relative}
+.col-lbl{display:grid;grid-template-columns:repeat(8,var(--cell));margin-left:16px;margin-bottom:1px}
+.col-lbl span{text-align:center;font-size:9px;color:var(--t2);font-weight:500;letter-spacing:.06em;display:flex;align-items:center;justify-content:center}
+.row-wrap{display:flex}
+.row-lbl{display:grid;grid-template-rows:repeat(8,var(--cell));width:14px;margin-right:2px}
+.row-lbl span{display:flex;align-items:center;justify-content:flex-end;padding-right:2px;font-size:9px;color:var(--t2);font-weight:500}
+
+.grid{display:inline-grid;grid-template-columns:repeat(8,var(--cell));gap:0;
+  touch-action:none;
+  border:2px solid var(--grid-border);
+  box-shadow:0 4px 20px rgba(0,0,0,.35),0 1px 3px rgba(0,0,0,.25)}
+.cell{width:var(--cell);height:var(--cell);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;position:relative;user-select:none;
+  font-size:clamp(14px,calc(var(--cell)*.44),24px);transition:filter .06s;
+  border-right:1px solid rgba(0,0,0,.12);border-bottom:1px solid rgba(0,0,0,.12)}
+.cell:hover{filter:brightness(1.1)}
+.cell[data-e="8"]{background:var(--egray);
+  background-image:repeating-linear-gradient(135deg,transparent,transparent 3px,rgba(255,255,255,.04) 3px,rgba(255,255,255,.04) 6px)}
+/* Gray cell grid lines need to be lighter */
+.cell[data-e="8"]{border-right-color:rgba(255,255,255,.08);border-bottom-color:rgba(255,255,255,.08)}
+
+/* Region borders — thicker, darker where estates differ */
+.cell.rb{border-right:2px solid var(--region-border)}
+.cell.bb{border-bottom:2px solid var(--region-border)}
+
+/* Pieces */
+.pc{line-height:1;position:relative;z-index:2;pointer-events:none}
+.queen-pc{color:#f7eed8;font-size:clamp(16px,calc(var(--cell)*.5),28px);
+  text-shadow:0 1px 2px rgba(0,0,0,.5),-1px 0 0 rgba(0,0,0,.4),1px 0 0 rgba(0,0,0,.4)}
+.king-pc{color:var(--king-color);font-size:clamp(16px,calc(var(--cell)*.5),28px);
+  text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.cross-pc{color:var(--cross-estate);font-weight:700;font-size:clamp(14px,calc(var(--cell)*.38),20px)}
+.cell[data-e="8"] .cross-pc{color:var(--cross-castle)}
+
+/* Highlights */
+.cell.hint-target{z-index:3}
+.cell.hint-target::after{content:'';position:absolute;inset:2px;
+  outline:2px solid rgba(255,252,240,.85);outline-offset:-2px;
+  border-radius:2px;pointer-events:none;
+  animation:htP 1.3s ease-in-out infinite}
+@keyframes htP{0%,100%{opacity:1}50%{opacity:.35}}
+.cell.diag-hl{box-shadow:inset 0 0 0 3px #fff;z-index:3}
+.cell.diag-hl::after{content:"";position:absolute;inset:0;background:rgba(255,255,255,.12);pointer-events:none}
+.cell.rc-hl{box-shadow:inset 0 0 0 3px #fff;z-index:3}
+.cell.rc-hl::after{content:"";position:absolute;inset:0;background:rgba(255,255,255,.12);pointer-events:none}
+.cell.piece-hl{box-shadow:inset 0 0 0 3px #fff;z-index:4}
+@keyframes conflictFlash{0%,100%{box-shadow:inset 0 0 0 3px var(--red);filter:brightness(1)}50%{box-shadow:inset 0 0 0 1px var(--red);filter:brightness(.7)}}
+.cell.conflict{animation:conflictFlash .6s ease-in-out infinite;z-index:5}
+.cell.check-wrong{box-shadow:inset 0 0 0 3px var(--red);filter:brightness(.75);z-index:5}
+
+/* Ghost overlays */
 .ghost-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:4;font-size:clamp(14px,calc(var(--cell)*0.45),24px);animation:ghostPulse 1.4s ease-in-out infinite}
 .ghost-overlay.ghost-queen{box-shadow:inset 0 0 0 3px rgba(255,255,255,.8);color:rgba(255,255,255,.85)}
 .ghost-overlay.ghost-hyp{box-shadow:inset 0 0 0 5px rgba(255,255,255,.95),0 0 15px 5px rgba(255,255,255,.45);color:rgba(255,255,255,.95);filter:brightness(1.15)}
@@ -85,183 +201,184 @@ button:active{transform:scale(0.96);box-shadow:none}
 .ghost-overlay.ghost-king-error{box-shadow:inset 0 0 0 3px rgba(255,60,60,.9),0 0 10px 2px rgba(255,60,60,.5);color:rgba(255,60,60,.9)}
 .ghost-overlay.ghost-contra{box-shadow:inset 0 0 0 3px rgba(255,60,60,.9),0 0 10px 2px rgba(255,60,60,.5);color:rgba(255,60,60,.95);font-size:20px}
 @keyframes ghostPulse{0%,100%{opacity:1}50%{opacity:.3}}
-@keyframes conflictFlash{0%,100%{box-shadow:inset 0 0 0 3px #ef4444;filter:brightness(1)}50%{box-shadow:inset 0 0 0 1px #ef4444;filter:brightness(.7)}}
-.cell.conflict{animation:conflictFlash .6s ease-in-out infinite;z-index:5}
-.cell.check-wrong{box-shadow:inset 0 0 0 3px #ef4444;filter:brightness(.75);z-index:5;transition:box-shadow .2s,filter .2s}
+
+/* ═══ DOCK ═══ */
+.dock{flex-shrink:0;padding:6px 16px calc(8px + var(--safe-b));display:flex;align-items:center;justify-content:center;gap:10px;
+  position:sticky;bottom:0;z-index:10;background:var(--s0);border-top:1px solid var(--b0)}
+.dock-col{display:flex;flex-direction:column;align-items:center;gap:1px}
+.dock-lbl{font-size:8px;font-weight:500;color:var(--copper);letter-spacing:.03em}
+.dk{width:44px;height:38px;border:1px solid var(--copper);border-radius:10px;background:var(--copper-dim);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s;color:var(--copper)}
+.dk:hover{background:rgba(196,149,106,.18);color:var(--copper-l);border-color:var(--copper-l)}
+.dk:active{transform:scale(.92);background:var(--copper-dim)}
+.dk svg{width:17px;height:17px}
+.dk.dk-done{background:var(--green-dim);border-color:var(--green);color:var(--green)}
+
+/* ═══ HINT ZONE — board never shifts because layout scrolls ═══ */
+.hint-zone{flex-shrink:0;overflow-y:auto;overflow-x:hidden;padding:0 8px;max-height:100px}
+.hint-zone::-webkit-scrollbar{width:2px}
+.hint-zone::-webkit-scrollbar-thumb{background:var(--b0);border-radius:1px}
 
 /* ═══ HINT BAR ═══ */
-.hint-bar{background:var(--bg-card);border-radius:10px;padding:10px 12px;margin:8px 0;font-size:11px;min-height:32px;border-left:4px solid var(--accent);display:flex;align-items:flex-start;gap:8px;box-shadow:var(--shadow-sm)}
-[data-theme="light"] .hint-bar{background:#8fb8bf}
-[data-theme="light"] .hint-bar .hint-more{color:#2d4a52}
-.hint-bar.completed{border-left-color:var(--success)}
-.hint-bar .hint-check{color:var(--success);font-size:14px;font-weight:700;flex-shrink:0}
+.hint-bar{background:var(--bg-card);border-left:3px solid var(--copper);
+  border-radius:0 8px 8px 0;padding:8px 12px;
+  font-size:12px}
+.hint-bar.completed{border-left-color:var(--green)}
+.hint-bar .hint-check{color:var(--green);font-size:14px;font-weight:700;flex-shrink:0}
 .hint-bar .hint-text{flex:1}
-.hint-bar .hint-nudge{color:var(--accent);font-weight:600}
-.hint-bar .hint-reason{color:var(--text-secondary);margin-top:3px;line-height:1.4}
-.hint-bar .hint-answer{color:var(--text-primary);font-weight:600;margin-top:3px}
-.hint-bar .hint-more{color:var(--text-muted);font-size:11px;margin-top:4px}
+.hint-bar .hint-nudge{color:var(--copper);font-weight:600}
+.hint-bar .hint-reason{color:var(--t1);margin-top:3px;line-height:1.5}
+.hint-bar .hint-answer{color:var(--t0);font-weight:600;margin-top:3px}
+.hint-bar .hint-more{color:var(--t3);font-size:11px;margin-top:4px}
 
-/* ═══ HIGHLIGHTS ═══ */
-.cell.diag-hl{box-shadow:inset 0 0 0 3px #fff;z-index:3}
-.cell.diag-hl::after{content:"";position:absolute;inset:0;background:rgba(255,255,255,.12);pointer-events:none}
-.cell.rc-hl{box-shadow:inset 0 0 0 3px #fff;z-index:3}
-.cell.rc-hl::after{content:"";position:absolute;inset:0;background:rgba(255,255,255,.12);pointer-events:none}
-.cell.piece-hl{box-shadow:inset 0 0 0 3px #fff;z-index:4}
+/* ═══ WIN OVERLAY ═══ */
+.win-overlay{display:none;position:fixed;inset:0;background:var(--overlay-bg);z-index:100;
+  justify-content:center;align-items:center;backdrop-filter:blur(4px)}
+.win-overlay.show{display:flex}
+.win-box{background:var(--bg-card);border:2px solid var(--green);border-radius:20px;
+  padding:32px 40px;text-align:center;box-shadow:var(--shadow-md);max-width:320px;width:90%}
+.win-crown{font-size:44px;margin-bottom:8px;display:block}
+.win-box h2{color:var(--green);font-family:var(--serif);font-size:24px;margin-bottom:4px;font-weight:700}
+.win-box .win-sub{color:var(--t2);font-size:13px;margin-bottom:20px}
+.win-stats{display:flex;gap:24px;justify-content:center;margin-bottom:20px}
+.win-stat{text-align:center}
+.win-stat .stat-val{font-family:var(--serif);font-size:22px;font-weight:700;color:var(--t0)}
+.win-stat .stat-lbl{font-size:10px;color:var(--t2);margin-top:2px}
+.win-box button{padding:12px 28px;background:var(--copper);color:var(--ink);border:none;border-radius:10px;
+  font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
+.win-box button:hover{background:var(--copper-l)}
 
-/* ═══ PIECE BAR ═══ */
-.piece-bar{display:flex;gap:5px;margin:8px 0;align-items:center}
+/* ═══ RULES MODAL ═══ */
+.rules-overlay{display:none;position:fixed;inset:0;background:var(--overlay-bg);z-index:200;
+  justify-content:center;align-items:center;padding:16px;backdrop-filter:blur(4px)}
+.rules-overlay.show{display:flex}
+.rules-box{background:var(--bg-card);border:2px solid var(--copper);border-radius:16px;padding:24px;
+  max-width:420px;width:100%;max-height:85vh;overflow-y:auto;position:relative;box-shadow:var(--shadow-md)}
+.rules-box h2{color:var(--copper);font-family:var(--serif);font-size:16px;margin-bottom:10px;font-weight:700}
+.rules-box h3{color:var(--copper);font-size:12px;margin:10px 0 4px;font-weight:700;opacity:.85}
+.rules-box p,.rules-box li{color:var(--t1);font-size:11px;line-height:1.6}
+.rules-box ul{padding-left:18px;margin:4px 0 8px}
+.rules-box li{margin-bottom:3px}
+.rules-close{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--t3);
+  font-size:18px;cursor:pointer;padding:4px;transition:color .2s}
+.rules-close:hover{color:var(--t0)}
+.rules-tip{background:var(--copper-dim);border-left:3px solid var(--copper);padding:8px 10px;
+  border-radius:0 8px 8px 0;margin-top:10px;font-size:10px;color:var(--copper);line-height:1.5}
 
-/* ═══ ACTION BAR ═══ */
-.action-bar{display:flex;gap:5px;margin:8px 0;flex-wrap:nowrap}
-.action-bar button{flex:1;padding:8px 4px;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis;height:38px;display:flex;align-items:center;justify-content:center;gap:4px;border-radius:8px;font-size:11px}
-.action-bar .btn-undo{background:var(--btn-undo);color:#fff}
-.action-bar .btn-clear{background:var(--btn-clear);color:#fff}
-.action-bar .btn-hint{background:var(--btn-hint);color:var(--btn-hint-text);box-shadow:0 0 16px var(--accent-glow),var(--shadow-sm)}
-.action-bar .btn-hint:hover{box-shadow:0 0 24px var(--accent-glow),var(--shadow-md)}
-.action-bar .btn-check{background:var(--btn-check);color:var(--btn-check-text)}
-[data-theme="light"] .sel-row select{background:#b2dbd9;border-color:#7fc4c1;color:#0f4a48}
-[data-theme="light"] .puz-btn{background:#b2dbd9;border-color:#7fc4c1;color:#0f4a48}
-[data-theme="light"] .puz-btn:hover{background:#96ceca;border-color:#5ab3af;color:#083533}
-[data-theme="light"] .action-bar .btn-undo{background:#5eaaa8;color:#fff}
+/* ═══ TUTORIAL ═══ */
+.tut-bar{background:linear-gradient(135deg,var(--s2),var(--s3));border:2px solid var(--copper);
+  border-radius:12px;padding:12px 14px;margin:4px 8px;display:none;position:relative;flex-shrink:0}
+.tut-bar.active{display:block}
+.tut-msg{color:var(--t0);font-size:13px;line-height:1.5;margin-bottom:8px;padding-right:36px}
+.tut-msg b{color:var(--copper-l)}
+.tut-controls{display:flex;align-items:center;gap:12px}
+.tut-next{background:var(--copper);color:var(--ink);border:none;border-radius:8px;padding:8px 20px;
+  font-weight:600;font-size:13px;cursor:pointer;font-family:var(--sans);transition:all .15s}
+.tut-next:hover{background:var(--copper-l);transform:translateY(-1px)}
+.tut-skip{color:var(--t3);font-size:12px;cursor:pointer;text-decoration:underline;margin-left:auto}
+.tut-skip:hover{color:var(--t0)}
+.tut-step-label{position:absolute;top:16px;right:16px;font-size:11px;color:var(--t3);font-weight:600}
+@keyframes tutPulse{0%,100%{box-shadow:inset 0 0 0 3px rgba(196,149,106,.7)}50%{box-shadow:inset 0 0 0 3px rgba(196,149,106,.15)}}
+.tut-pulse{animation:tutPulse 1.2s ease-in-out infinite !important;z-index:5 !important;position:relative}
+.tut-img-overlay{display:none;position:absolute;inset:0;z-index:50;background:rgba(19,17,16,.88);
+  backdrop-filter:blur(2px);border-radius:4px;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:12px}
+.tut-img-overlay.active{display:flex}
+.tut-img-overlay img{max-width:min(85%,320px);border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,.5);border:2px solid var(--b0)}
+.tut-img-caption{color:var(--t0);font-size:14px;font-weight:600;text-align:center;line-height:1.5;max-width:320px}
+.tut-img-counter{position:absolute;top:12px;right:16px;font-size:11px;color:var(--t3);font-weight:600}
+.tut-img-nav{display:flex;gap:12px;align-items:center}
+.tut-img-prev{background:transparent;border:2px solid var(--b1);color:var(--t1);border-radius:8px;
+  padding:7px 16px;font-weight:600;font-size:13px;cursor:pointer;font-family:var(--sans)}
+.tut-img-prev:hover{border-color:var(--t2);color:var(--t0)}
+.tut-btn{background:transparent;border:2px solid var(--copper);color:var(--copper);border-radius:8px;
+  padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:all .15s;white-space:nowrap}
+.tut-btn:hover{background:var(--copper-dim)}
+[data-theme="light"] .tut-bar{background:linear-gradient(135deg,#fef9ec,#fef3cd);border-color:var(--copper)}
+[data-theme="light"] .tut-msg{color:var(--t0)}
+[data-theme="light"] .tut-msg b{color:var(--copper)}
+[data-theme="light"] .tut-img-overlay{background:rgba(255,255,255,.88)}
 
-/* ═══ SOLVER STEPS ═══ */
-.steps{background:var(--bg-card);border-radius:10px;padding:8px;max-height:350px;overflow-y:auto}
-.step{padding:5px 7px;margin-bottom:3px;border-radius:6px;font-size:10px;border-left:3px solid;opacity:.35;transition:opacity .15s}
-.step.rev{opacity:1}.step.cur{opacity:1;outline:1px solid var(--accent)}
-.step.L0{border-color:#16a34a;background:#16a34a15}
-.step.L1{border-color:#22d3ee;background:#22d3ee15}
-.step.king{border-color:var(--accent);background:var(--accent-dim)}
-.step.L2{border-color:#a855f7;background:#a855f715}
-.step.kingv{border-color:#ef4444;background:#ef444415}
-.step.kingv2{border-color:#f43f5e;background:#f43f5e15}
-.step.bif{border-color:#ec4899;background:#ec489915}
-.step.fbif{border-color:#dc2626;background:#dc262615}
-.step .t{font-weight:700;color:var(--accent)}
-
-/* ═══ LOG PANEL ═══ */
-.log-panel{background:var(--bg-card);border-radius:10px;padding:8px;margin-top:8px;max-height:300px;overflow-y:auto}
-.log-entry{padding:4px 7px;margin-bottom:2px;border-radius:5px;font-size:10px;display:flex;gap:8px;align-items:baseline}
-.log-entry.queen{border-left:3px solid var(--accent);background:var(--accent-dim)}
-.log-entry.king{border-left:3px solid #a855f7;background:#a855f708}
-.log-entry.cross{border-left:3px solid var(--border-mid);background:var(--border-subtle)}
-.log-entry.undo{border-left:3px solid var(--danger);background:var(--danger-dim);opacity:.6}
-.log-entry.hint{border-left:3px solid #22d3ee;background:#22d3ee08}
-.log-entry .seq{color:var(--text-muted);min-width:22px}
-.log-entry .time{color:var(--text-muted);font-size:9px;min-width:35px;opacity:.7}
-.log-entry .act{flex:1}
-.log-entry .tag{font-size:8px;padding:1px 5px;border-radius:3px;font-weight:600;white-space:nowrap}
-.tag.match{background:var(--success-dim);color:var(--success)}
-.tag.early{background:var(--accent-dim);color:var(--accent)}
-.tag.skip{background:#a855f733;color:#a855f7}
-.tag.wrong{background:var(--danger-dim);color:var(--danger)}
-
-/* ═══ COLLAPSIBLE SECTIONS ═══ */
-details{background:var(--bg-card);border-radius:10px;margin-top:8px;box-shadow:var(--shadow-sm)}
-details>summary{cursor:pointer;padding:10px 12px;font-size:11px;font-weight:600;color:var(--text-secondary);list-style:none;display:flex;justify-content:space-between;align-items:center;user-select:none;transition:color .2s}
-details>summary:hover{color:var(--text-primary)}
+/* ═══ SOLVER STEPS (collapsible) ═══ */
+details{background:var(--bg-card);border-radius:10px;margin:8px 16px;box-shadow:var(--shadow-sm)}
+details>summary{cursor:pointer;padding:10px 12px;font-size:11px;font-weight:600;color:var(--t1);
+  list-style:none;display:flex;justify-content:space-between;align-items:center;user-select:none}
+details>summary:hover{color:var(--t0)}
 details>summary::-webkit-details-marker{display:none}
 details>summary::before{content:"▶";font-size:8px;margin-right:6px;transition:transform .15s;display:inline-block}
 details[open]>summary::before{transform:rotate(90deg)}
-details>summary .badge{font-size:9px;color:var(--text-muted);font-weight:400}
+details>summary .badge{font-size:9px;color:var(--t3);font-weight:400}
 details>.details-body{padding:0 10px 10px}
-
-/* ═══ PUZZLE SELECTOR ═══ */
-.puz-selector{margin-bottom:12px}
-.sel-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.sel-row select{padding:6px 10px;border-radius:8px;border:2px solid var(--border-subtle);background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;appearance:auto;min-width:0;transition:border-color .2s;box-shadow:var(--shadow-sm)}
-.sel-row select:focus{border-color:var(--accent);outline:none}
-.sel-row .solved-tag{font-size:10px;color:var(--text-muted);white-space:nowrap}
-.puz-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-top:8px;max-width:calc(var(--grid-w) + 18px)}
-.puz-btn{height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer;border:2px solid var(--border-subtle);background:var(--bg-card);color:var(--text-muted);position:relative;transition:all .15s;box-shadow:var(--shadow-sm)}
-.puz-btn:hover{border-color:var(--border-mid);background:var(--bg-hover);color:var(--text-primary)}
-.puz-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);box-shadow:0 0 8px var(--accent-glow)}
-.puz-btn.solved{border-color:var(--success);color:var(--success);background:var(--success-dim)}
-.puz-btn.solved::after{content:"✓";position:absolute;top:-5px;right:-3px;font-size:7px;background:var(--success);color:#fff;width:13px;height:13px;border-radius:50%;display:flex;align-items:center;justify-content:center;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.3)}
-.puz-btn.solved.active{border-color:var(--accent)}
-.progress-bar{height:5px;background:var(--border-subtle);border-radius:3px;margin-top:8px;overflow:hidden;max-width:calc(var(--grid-w) + 18px)}
-.progress-fill{height:100%;background:var(--success);border-radius:3px;transition:width .3s}
-.progress-text{font-size:9px;color:var(--text-muted);margin-top:2px}
-
-/* ═══ WIN OVERLAY ═══ */
-.win-overlay{display:none;position:fixed;inset:0;background:var(--overlay-bg);z-index:100;justify-content:center;align-items:center;backdrop-filter:blur(4px)}
-.win-overlay.show{display:flex}
-.win-box{background:var(--bg-card);border:2px solid var(--success);border-radius:16px;padding:28px 36px;text-align:center;box-shadow:var(--shadow-md)}
-.win-box h2{color:var(--success);font-size:20px;margin-bottom:8px;font-weight:800}
-.win-box p{color:var(--text-secondary);font-size:12px;margin-bottom:12px}
-.win-box .time{color:var(--accent);font-size:16px;font-weight:700}
-.win-stats{display:flex;gap:16px;justify-content:center;margin-top:10px;font-size:12px;color:var(--text-secondary)}
-.win-stats span{display:flex;align-items:center;gap:4px}
-.win-stats .stat-val{font-weight:700;color:var(--text-primary)}
+.steps{border-radius:6px;padding:4px;max-height:350px;overflow-y:auto}
+.step{padding:5px 7px;margin-bottom:3px;border-radius:6px;font-size:10px;border-left:3px solid;opacity:.35}
+.step.rev{opacity:1}.step.cur{opacity:1;outline:1px solid var(--copper)}
+.step.L0{border-color:var(--green);background:rgba(106,158,106,.08)}
+.step.L1{border-color:#52a0a0;background:rgba(82,160,160,.08)}
+.step.king{border-color:var(--copper);background:var(--copper-dim)}
+.step.L2{border-color:#946294;background:rgba(148,98,148,.08)}
+.step.kingv{border-color:var(--red);background:var(--red-dim)}
+.step.kingv2{border-color:#c06060;background:rgba(192,96,96,.08)}
+.step.bif{border-color:#c06080;background:rgba(192,96,128,.08)}
+.step.fbif{border-color:#a04040;background:rgba(160,64,64,.08)}
+.step .t{font-weight:700;color:var(--copper)}
+.log-panel{border-radius:6px;padding:4px;margin-top:8px;max-height:300px;overflow-y:auto}
 
 /* ═══ RESPONSIVE ═══ */
-@media(min-width:768px){
-  .hint-bar{font-size:14px;padding:12px 16px}
-  .hint-bar .hint-more{font-size:12px}
-  .piece-bar>span:first-child{font-size:12px !important}
-  .piece-bar .ct{font-size:13px !important}
-  .action-bar button{height:42px;font-size:12px;border-radius:10px}
-  .puz-btn{height:36px;font-size:12px}
+@media(min-width:768px){.hint-bar{font-size:14px;padding:12px 16px}.hint-bar .hint-more{font-size:12px}}
+@media(min-width:500px){
+  .app{max-width:520px;margin:auto;height:min(calc(100vh - 32px), 880px);
+    border-radius:20px;overflow:hidden;border:1px solid var(--b0);
+    box-shadow:0 8px 40px rgba(0,0,0,.5)}
 }
 
-/* ═══ TUTORIAL ═══ */
-.tut-bar{background:linear-gradient(135deg,#1a2744,#1e3a5f);border:2px solid var(--accent,#f59e0b);border-radius:14px;padding:16px 18px;margin-bottom:14px;display:none;position:relative;max-width:calc(var(--grid-w) + 18px + 6px)}
-.tut-bar.active{display:block}
-.tut-msg{color:var(--text-primary,#e2e8f0);font-size:14px;line-height:1.7;margin-bottom:12px}
-.tut-msg b{color:#fbbf24}
-.tut-controls{display:flex;align-items:center;gap:12px}
-.tut-next{background:#f59e0b;color:#0f172a;border:none;border-radius:8px;padding:8px 20px;font-weight:600;font-size:13px;cursor:pointer;font-family:inherit;transition:all .15s}
-.tut-next:hover{background:#fbbf24;transform:translateY(-1px)}
-.tut-skip{color:var(--text-muted,#94a3b8);font-size:12px;cursor:pointer;text-decoration:underline;margin-left:auto}
-.tut-skip:hover{color:var(--text-primary,#e2e8f0)}
-.tut-step-label{position:absolute;top:16px;right:16px;font-size:11px;color:var(--text-muted,#64748b);font-weight:600}
-@keyframes tutPulse{0%,100%{box-shadow:inset 0 0 0 3px rgba(245,158,11,.7)}50%{box-shadow:inset 0 0 0 3px rgba(245,158,11,.15)}}
-.tut-pulse{animation:tutPulse 1.2s ease-in-out infinite !important;z-index:5 !important;position:relative}
-/* Tutorial image overlay */
-.tut-img-overlay{display:none;position:absolute;inset:0;z-index:50;background:rgba(15,23,42,.85);backdrop-filter:blur(2px);border-radius:12px;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:12px}
-.tut-img-overlay.active{display:flex}
-.tut-img-overlay img{max-width:min(85%,320px);border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,.5);border:2px solid var(--border-subtle,#334155)}
-.tut-img-caption{color:var(--text-primary,#e2e8f0);font-size:14px;font-weight:600;text-align:center;line-height:1.5;max-width:320px}
-.tut-img-counter{position:absolute;top:12px;right:16px;font-size:11px;color:var(--text-muted,#64748b);font-weight:600}
-.tut-img-nav{display:flex;gap:12px;align-items:center}
-.tut-img-prev{background:transparent;border:2px solid var(--border-subtle,#475569);color:var(--text-secondary,#94a3b8);border-radius:8px;padding:7px 16px;font-weight:600;font-size:13px;cursor:pointer;font-family:inherit}
-.tut-img-prev:hover{border-color:var(--text-muted);color:var(--text-primary)}
-[data-theme="light"] .tut-img-overlay{background:rgba(255,255,255,.88)}
-[data-theme="light"] .tut-img-caption{color:#1e293b}
-.tut-btn{background:transparent;border:2px solid var(--accent,#f59e0b);color:var(--accent,#f59e0b);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
-.tut-btn:hover{background:rgba(245,158,11,.15)}
-[data-theme="light"] .tut-bar{background:linear-gradient(135deg,#fef9ec,#fef3cd);border-color:#d97706}
-[data-theme="light"] .tut-msg{color:#1e293b}
-[data-theme="light"] .tut-msg b{color:#b45309}
 </style>
 </head>
 <body>
-<div class="wrapper">
-<div class="title-row">
-  <h1>👑 Kings vs Queens v8</h1>
-  <button class="rules-btn" onclick="document.getElementById('rulesOverlay').classList.add('show')">? Rules</button>
-  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle dark/light mode">🌙</button>
-</div>
-<div class="puz-selector">
-  <div class="sel-row">
-    <select id="diffSelect" onchange="onDiffChange(this.value)"></select>
-    <select id="puzSelect" onchange="onPuzPageChange(this.value)"></select>
-    <span class="solved-tag" id="progText"></span>
-    <button class="tut-btn" id="tutBtn" onclick="startTutorial()">📖 Tutorial</button>
+
+<div class="app">
+
+<!-- ═══ SELECT SCREEN ═══ -->
+<div class="screen on" id="selScr">
+  <div class="sel-head">
+    <div class="sel-crown"><svg viewBox="0 0 56 56" fill="none"><path d="M8 40L4 16l12 10 12-14 12 14 12-10-4 24H8z" fill="none" stroke="var(--copper)" stroke-width="2.5" stroke-linejoin="round"/><path d="M8 40h40v4H8z" fill="none" stroke="var(--copper)" stroke-width="2.5" stroke-linejoin="round"/><circle cx="28" cy="12" r="2.5" fill="var(--copper)"/><circle cx="4" cy="16" r="2" fill="var(--copper)"/><circle cx="52" cy="16" r="2" fill="var(--copper)"/><circle cx="16" cy="26" r="2" fill="var(--copper)"/><circle cx="40" cy="26" r="2" fill="var(--copper)"/></svg></div>
+    <h1 class="sel-title">Kings <span>vs</span> Queens</h1>
+    <p class="sel-sub">65 puzzles · 5 difficulty tiers</p>
   </div>
+  <div class="tier-strip" id="tierStrip"></div>
   <div class="puz-grid" id="puzGrid"></div>
   <div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
-</div>
-<div id="tutBar" class="tut-bar">
-  <span class="tut-step-label" id="tutStepLabel"></span>
-  <div class="tut-msg" id="tutMsg"></div>
-  <div class="tut-controls" id="tutControls">
-    <button class="tut-next" id="tutNext" onclick="advanceTutorial()">Next →</button>
-    <span class="tut-skip" onclick="endTutorial()">Skip tutorial</span>
+  <div class="progress-text" id="progText"></div>
+  <div class="sel-bottom">
+    <button class="tut-btn" id="tutBtn" onclick="startTutorial()">Tutorial</button>
+    <button class="sel-play" id="selPlayBtn" onclick="loadPuzzle(currentDiff,currentIdx)">
+      <span class="sel-play-label">Play</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14m-6-6l6 6-6 6"/></svg>
+    </button>
   </div>
 </div>
-<div class="main">
-  <div class="col-board">
-    <div id="boardWrap" style="display:inline-block;position:relative">
+
+<!-- ═══ PLAY SCREEN ═══ -->
+<div class="screen play-screen off-r" id="playScr">
+  <div class="topbar">
+    <button class="btn-back" onclick="goSel()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="play-id" id="playLabel"><span class="tn" id="playTier"></span> <span id="playNum"></span></div>
+    <span class="top-timer" id="timerDisp">0:00</span>
+    <span class="top-sep"></span>
+    <span class="top-ct qc" id="qCt">♛ 0/8</span>
+    <span class="top-ct kc" id="kCt">♚ 0/2</span>
+    <button class="btn-theme" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">☽</button>
+  </div>
+
+  <div id="tutBar" class="tut-bar">
+    <span class="tut-step-label" id="tutStepLabel"></span>
+    <div class="tut-msg" id="tutMsg"></div>
+    <div class="tut-controls" id="tutControls">
+      <button class="tut-next" id="tutNext" onclick="advanceTutorial()">Next →</button>
+      <span class="tut-skip" onclick="endTutorial()">Skip tutorial</span>
+    </div>
+  </div>
+
+  <div class="board-wrap">
+    <div class="board-outer" id="boardWrap" style="position:relative">
       <div id="tutImgOverlay" class="tut-img-overlay">
         <span class="tut-img-counter" id="tutImgCounter"></span>
         <img id="tutImgPic" src="" alt="Tutorial">
@@ -272,70 +389,76 @@ details>.details-body{padding:0 10px 10px}
         </div>
         <span class="tut-skip" onclick="endTutorial()" style="margin-top:4px">Skip tutorial</span>
       </div>
-      <div style="display:flex">
-        <div style="width:18px;flex-shrink:0"></div>
-        <div id="colLbl" style="display:grid;grid-template-columns:repeat(8,var(--cell));gap:var(--gap);font-size:9px;color:var(--text-muted);text-align:center;margin-left:3px"></div>
-      </div>
-      <div style="display:flex">
-        <div id="rowLbl" style="display:grid;grid-template-rows:repeat(8,var(--cell));gap:var(--gap);width:18px;flex-shrink:0;font-size:9px;color:var(--text-muted);margin-top:3px"></div>
+      <div class="col-lbl" id="colLbl"></div>
+      <div class="row-wrap">
+        <div class="row-lbl" id="rowLbl"></div>
         <div class="grid" id="grid"></div>
       </div>
     </div>
-    <div class="piece-bar" style="max-width:var(--grid-w);margin-left:18px">
-      <span style="font-size:9px;color:var(--text-secondary)">Tap:✕ &nbsp;2×tap:♛/♚ &nbsp;Hold:highlight &nbsp;Drag:multi-✕</span>
-      <span class="ct" style="margin-left:auto;font-size:10px;color:var(--text-primary)">♛<span id="qCt">0/8</span> ♚<span id="kCt">0/2</span></span>
+  </div>
+
+  <div class="dock">
+    <div class="dock-col"><button class="dk" onclick="doUndo()" title="Undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h10a5 5 0 010 10H9"/><path d="M7 14L3 10l4-4"/></svg></button><span class="dock-lbl">Undo</span></div>
+    <div class="dock-col"><button class="dk" onclick="doClear()" title="Clear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2m-7 3v7m4-7v7M5 6l1 13a2 2 0 002 2h8a2 2 0 002-2l1-13"/></svg></button><span class="dock-lbl">Clear</span></div>
+    <div class="dock-col"><button class="dk" id="dkHint" onclick="doStep()" title="Hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 014 12.7V17a2 2 0 01-2 2h-4a2 2 0 01-2-2v-2.3A7 7 0 0112 2zm-1.5 19h3a.5.5 0 010 1h-3a.5.5 0 010-1z"/></svg></button><span class="dock-lbl">Hint</span></div>
+    <div class="dock-col"><button class="dk" onclick="checkBoard()" title="Check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5L20 7"/></svg></button><span class="dock-lbl">Check</span></div>
+  </div>
+
+  <div class="hint-zone"><div id="hintBar" style="display:none"></div></div>
+</div>
+
+</div><!-- end app -->
+
+<!-- ═══ WIN OVERLAY ═══ -->
+<div class="win-overlay" id="winOverlay" onclick="if(event.target===this)closeWin()">
+  <div class="win-box">
+    <span class="win-crown">♛</span>
+    <h2>Solved!</h2>
+    <p class="win-sub" id="winMsg"></p>
+    <div class="win-stats">
+      <div class="win-stat"><div class="stat-val" id="winTime"></div><div class="stat-lbl">Time</div></div>
+      <div class="win-stat"><div class="stat-val" id="winHints"></div><div class="stat-lbl">Hints</div></div>
+      <div class="win-stat"><div class="stat-val" id="winUndos"></div><div class="stat-lbl">Undos</div></div>
     </div>
-    <div class="action-bar" style="max-width:calc(var(--grid-w) + 18px + 6px)">
-      <button class="btn-undo" onclick="doUndo()">↩ Undo</button>
-      <button class="btn-clear" onclick="doClear()">🗑 Clear</button>
-      <button class="btn-hint" onclick="doStep()">💡 Hint</button>
-      <button class="btn-check" onclick="checkBoard()">✔ Check Board</button>
-      <!-- <button class="btn-undo" onclick="copyState()" style="font-size:11px;padding:6px 8px">📋 State</button> -->
-    </div>
-    <div id="hintBar" style="display:none"></div>
+    <button onclick="nextPuzzle()">Next puzzle →</button>
   </div>
 </div>
-</div><!-- end wrapper -->
+
+<!-- ═══ RULES OVERLAY ═══ -->
 <div class="rules-overlay" id="rulesOverlay" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="rules-box">
-    <button class="rules-close" onclick="document.getElementById('rulesOverlay').classList.remove('show')">&times;</button>
-    <h2>👑 How to Play</h2>
-    <p>Fill the board by placing <b style="color:#fbbf24">8 Queens</b> and <b style="color:#e2e8f0">2 Kings</b>.</p>
-    <h3>♛ Queens</h3>
+    <button class="rules-close" onclick="document.getElementById('rulesOverlay').classList.remove('show')">×</button>
+    <h2>How to Play</h2>
+    <p>Place <b>8 Queens</b> and <b>2 Kings</b> on an 8×8 grid. Each puzzle has exactly one solution.</p>
+    <h3>Queens</h3>
     <ul>
-      <li>Place one queen in each <b>colored region</b> (estate).</li>
-      <li>No two queens may share the same <b>row</b> or <b>column</b>.</li>
-      <li>Queens cannot be <b>adjacent</b> to each other (including diagonals) — but they <em>can</em> share a long diagonal.</li>
+      <li>One queen per colored <b>estate</b></li>
+      <li>No two queens in the same <b>row or column</b></li>
+      <li>Queens cannot be <b>adjacent</b> (including diagonals)</li>
+      <li>Queens <em>can</em> share a long diagonal</li>
     </ul>
-    <h3>♚ Kings</h3>
+    <h3>Kings</h3>
     <ul>
-      <li>Both kings go on <b style="color:#9ca3af">gray cells</b> only.</li>
-      <li>Kings cannot be <b>adjacent to</b> or on the <b>same diagonal</b> as any queen (at any distance).</li>
-      <li>Kings cannot share a <b>row, column, or diagonal</b> with each other.</li>
+      <li>Both kings on <b>gray cells</b> only</li>
+      <li>No king adjacent to or on the same <b>diagonal</b> as a queen (any distance)</li>
+      <li>Kings cannot share a <b>row, column, or diagonal</b></li>
     </ul>
     <h3>Controls</h3>
     <ul>
-      <li><b>Tap</b> an empty cell → place a cross (✕) to mark it eliminated.</li>
-      <li><b>Double-tap</b> a cross → upgrade to ♛ (on color) or ♚ (on gray).</li>
-      <li><b>Hold</b> a placed piece → highlight its attack zones.</li>
-      <li><b>Drag</b> across empty cells → place crosses quickly.</li>
+      <li><b>Tap</b> → place cross ✕</li>
+      <li><b>Double-tap</b> → place queen ♛ or king ♚</li>
+      <li><b>Hold</b> → show attack zones</li>
+      <li><b>Drag</b> → multi-cross</li>
     </ul>
-    <div class="rules-tip">💡 <b>Start with queens:</b> look for estates with very few options, or rows/columns where only one estate fits. Use crosses to eliminate impossible cells, then narrow down to the solution!</div>
+    <div class="rules-tip">Use <b>Hint</b> to learn solving techniques step by step.</div>
   </div>
 </div>
-<div class="win-overlay" id="winOverlay" onclick="closeWin()">
-  <div class="win-box" onclick="event.stopPropagation()">
-    <h2>🎉 Solved!</h2>
-    <p id="winMsg"></p>
-    <div class="time" id="winTime"></div>
-    <div class="win-stats" id="winStats"></div>
-    <button style="background:var(--success);color:#fff;margin-top:14px;padding:10px 24px;border-radius:10px" onclick="nextPuzzle()">Next Puzzle →</button>
-  </div>
-</div>
+
 <script>
+
 const S=8,CID=8,DIRS=[[0,1],[0,-1],[1,0],[-1,0]];
 const EN=["Rose","Orange","Sand","Green","Blue","Purple","Cyan","Teal"];
-const EC=["#EE6677","#EE7733","#CCBB44","#228833","#4477AA","#AA3377","#66CCEE","#44AA99"];
+const EC=["#be7272","#c8906e","#bfae5e","#5e9060","#5a80a2","#946294","#52a0a0","#558e7c"];
 function idx(r,c){return r*S+c}function rc(i){return[i/S|0,i%S]}
 function tch(r1,c1,r2,c2){return Math.abs(r1-r2)<=1&&Math.abs(c1-c2)<=1&&!(r1===r2&&c1===c2)}
 function src(r1,c1,r2,c2){return r1===r2||c1===c2}
@@ -1437,7 +1560,7 @@ function classifyPuzzle(rn, l1, pureQ){
 let puz=null,board=[],hist=[],sr=null,si=-1,rNew=null;
 let moveLog=[],startTime=0;
 
-function updCts(){let q=0,k=0;for(const v of board){if(v==="queen")q++;if(v==="king")k++}document.getElementById("qCt").textContent=q+"/8";document.getElementById("kCt").textContent=k+"/2"}
+function updCts(){let q=0,k=0;for(const v of board){if(v==="queen")q++;if(v==="king")k++}document.getElementById("qCt").textContent="♛ "+q+"/8";document.getElementById("kCt").textContent="♚ "+k+"/2"}
 function setSt(m,t){/* status bar removed */}
 
 // ═══ LOGGING ═══
@@ -1451,21 +1574,30 @@ function renderLog(){}
 function renderSteps(){}
 function renderBoard(){
   if(!puz)return;const g=document.getElementById("grid");g.innerHTML="";
+  const R2=puz.R;
   for(let r=0;r<S;r++)for(let c=0;c<S;c++){
-    const i=idx(r,c),rid=puz.R[i],clr=rid===CID?(document.documentElement.getAttribute('data-theme')==='light'?'#9ca3af':'#6b7280'):EC[rid];
-    const d=document.createElement("div");d.className="cell";d.style.background=clr;
-    if(rid===CID)d.style.backgroundImage="repeating-linear-gradient(135deg,transparent,transparent 3px,rgba(255,255,255,.18) 3px,rgba(255,255,255,.18) 4.5px)";
+    const i=idx(r,c),rid=R2[i],clr=rid===CID?'':EC[rid];
+    const d=document.createElement("div");d.className="cell";
+    d.setAttribute("data-e",rid);
+    if(rid!==CID)d.style.background=clr;
+    // Region borders
+    if(c<7&&R2[i]!==R2[i+1])d.classList.add("rb");
+    if(r<7&&R2[i]!==R2[idx(r+1,c)])d.classList.add("bb");
+    if(c===0)d.classList.add("col0");
+    if(c===7)d.classList.add("col7");
+    if(r===0)d.classList.add("row0");
+    if(r===7)d.classList.add("row7");
     const v=board[i];
-    if(v==="queen")d.innerHTML="<span style='pointer-events:none;position:relative;z-index:2;color:#fbbf24;text-shadow:0 1px 3px rgba(0,0,0,.7),-1px 0 0 rgba(0,0,0,.6),1px 0 0 rgba(0,0,0,.6),0 -1px 0 rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.6)'>♛</span>";
-    else if(v==="king"){const kc=getComputedStyle(document.documentElement).getPropertyValue('--king-color').trim()||'#fff';d.innerHTML="<span style='pointer-events:none;position:relative;z-index:2;color:"+kc+";text-shadow:0 1px 3px rgba(0,0,0,.5)'>♚</span>";}
-    else if(v==="cross"){const xc=rid===CID?(document.documentElement.getAttribute("data-theme")==="light"?"rgba(255,255,255,.52)":"rgba(255,255,255,.52)"):(document.documentElement.getAttribute("data-theme")==="light"?"rgba(0,0,0,.3)":"rgba(0,0,0,.32)");d.innerHTML="<span style='pointer-events:none;color:"+xc+";font-size:clamp(16px,calc(var(--cell)*0.4),22px);font-weight:700;text-shadow:none'>✕</span>";}
+    if(v==="queen")d.innerHTML="<span class='pc queen-pc'>♛</span>";
+    else if(v==="king")d.innerHTML="<span class='pc king-pc'>♚</span>";
+    else if(v==="cross")d.innerHTML="<span class='pc cross-pc'>✕</span>";
     d.dataset.r=r;d.dataset.c=c;
     d.addEventListener("mousedown",(e)=>{e.preventDefault();cellMouseDown(r,c)});
     d.addEventListener("mouseenter",()=>{if(dragging)cellDrag(r,c)});
     d.addEventListener("touchstart",(e)=>{e.preventDefault();cellMouseDown(r,c)},{passive:false});
     g.appendChild(d)}
-  const cl=document.getElementById("colLbl");cl.innerHTML="";for(let c=0;c<S;c++){const s=document.createElement("span");s.textContent=c+1;s.style.cssText="display:flex;align-items:center;justify-content:center";cl.appendChild(s)}
-  const rl=document.getElementById("rowLbl");rl.innerHTML="";for(let r=0;r<S;r++){const s=document.createElement("span");s.textContent=r+1;s.style.cssText="display:flex;align-items:center;justify-content:center";rl.appendChild(s)}
+  const cl=document.getElementById("colLbl");cl.innerHTML="";for(let c=0;c<S;c++){const s=document.createElement("span");s.textContent=c+1;cl.appendChild(s)}
+  const rl=document.getElementById("rowLbl");rl.innerHTML="";for(let r=0;r<S;r++){const s=document.createElement("span");s.textContent=r+1;rl.appendChild(s)}
   updCts();checkWin();checkHintCompletion();checkConflicts()}
 let dragging=false,dragMode=null;
 let lpTimer=null,lpActive=false,lpTarget=null;
@@ -1573,9 +1705,9 @@ function updateCell(r,c){
   const g=document.getElementById("grid");
   const i=idx(r,c);const d=g.children[i];if(!d)return;
   const v=board[i];
-  if(v==="queen")d.innerHTML="<span style='pointer-events:none;position:relative;z-index:2;color:#fbbf24;text-shadow:0 1px 3px rgba(0,0,0,.7),-1px 0 0 rgba(0,0,0,.6),1px 0 0 rgba(0,0,0,.6),0 -1px 0 rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.6)'>♛</span>";
-  else if(v==="king"){const kc=getComputedStyle(document.documentElement).getPropertyValue('--king-color').trim()||'#fff';d.innerHTML="<span style='pointer-events:none;position:relative;z-index:2;color:"+kc+";text-shadow:0 1px 3px rgba(0,0,0,.5)'>♚</span>";}
-  else if(v==="cross"){const xc=puz.R[i]===CID?(document.documentElement.getAttribute("data-theme")==="light"?"rgba(255,255,255,.52)":"rgba(255,255,255,.52)"):(document.documentElement.getAttribute("data-theme")==="light"?"rgba(0,0,0,.3)":"rgba(0,0,0,.32)");d.innerHTML="<span style='pointer-events:none;color:"+xc+";font-size:clamp(16px,calc(var(--cell)*0.4),22px);font-weight:700;text-shadow:none'>✕</span>";}
+  if(v==="queen")d.innerHTML="<span class='pc queen-pc'>♛</span>";
+  else if(v==="king")d.innerHTML="<span class='pc king-pc'>♚</span>";
+  else if(v==="cross")d.innerHTML="<span class='pc cross-pc'>✕</span>";
   else d.innerHTML="";
   updCts();checkHintCompletion(r,c);checkConflicts();
   const _cw=document.getElementById("grid");if(_cw&&_cw.children[idx(r,c)])_cw.children[idx(r,c)].classList.remove("check-wrong");}
@@ -1813,7 +1945,7 @@ function _computeNextHintInner(){
     if(placedEids.has(e)){dbg.push(EN[e]+"=placed");continue}
     const rem=remCells(e),eff=effCells(e);
     dbg.push(EN[e]+":[rem="+rem.length+" eff="+eff.length+(rem.length!==eff.length?" DIFF!":"")+"]")}
-  console.log("[HINT] Queens:"+placedQueens.map(([r,c])=>cn(r,c)).join(",")+" Kings:"+placedKings.map(([r,c])=>cn(r,c)).join(",")+" "+dbg.join(" "))}
+  }
 
   // ════════════════════════════════════════════════════════════════
   // PHASE 0: CLEANUP — propagate from already-placed pieces
@@ -2099,7 +2231,7 @@ function _computeNextHintInner(){
             const kc0=kcCrosses[0];
             const clusterDesc=kc0.cCells.map(([r,c])=>cn(r,c)).join(", ");
             const ghosts=kc0.cCells.map(([r,c])=>({r,c,cls:"ghost-confined",txt:"♚"}));
-            console.log("[K½] cluster "+kc0.ci+" {"+clusterDesc+"} kills "+EN[kc0.eid]+" at "+cn(kc0.r,kc0.c));
+            
             return{targets:[{r:kc0.r,c:kc0.c,type:"cross"}],ghosts,focusEid:kc0.eid,
               nudge:"[K\u00bd] "+EN[kc0.eid]+" can't go at "+cn(kc0.r,kc0.c),
               reason:"A King must go at "+clusterDesc+" — every option blocks "+cn(kc0.r,kc0.c),
@@ -2448,7 +2580,7 @@ function _computeNextHintInner(){
 
   {
     const un=[];for(let eid=0;eid<8;eid++)if(!placedEids.has(eid))un.push(eid);
-    console.log("[Phase4] unplaced:",un.map(e=>EN[e]).join(","));
+    
     // Naked sets: K estates share exactly K rows → eliminate others in those rows
     for(let K=2;K<=Math.min(4,un.length);K++){
       for(const cb of combos(un,K)){
@@ -2458,7 +2590,7 @@ function _computeNextHintInner(){
           const blocked=[];
           for(const o of un){if(cb.includes(o))continue;
             for(const[r,c]of effCells(o))if(allRows.has(r))blocked.push({r,c,type:"cross"})}
-          if(blocked.length)console.log("[Phase4] row locked pair:",cb.map(e=>EN[e]).join("+"),"rows:",[...allRows].map(r=>r+1),"blocked:",blocked.length);
+          if(blocked.length)
           if(blocked.length){
             const names=cb.map(e=>EN[e]).join(" & ");
             const rowList=[...allRows].sort().map(r=>r+1).join(", ");
@@ -2477,7 +2609,7 @@ function _computeNextHintInner(){
           const blocked=[];
           for(const o of un){if(cb.includes(o))continue;
             for(const[r,c]of effCells(o))if(allCols.has(c))blocked.push({r,c,type:"cross"})}
-          if(blocked.length)console.log("[Phase4] col locked pair:",cb.map(e=>EN[e]).join("+"),"cols:",[...allCols].map(c=>c+1),"blocked:",blocked.length);
+          if(blocked.length)
           if(blocked.length){
             const names=cb.map(e=>EN[e]).join(" & ");
             const colList=[...allCols].sort().map(c=>c+1).join(", ");
@@ -2837,9 +2969,9 @@ function _computeNextHintInner(){
     const ppK=[];
     for(let i=0;i<S*S;i++){if(R[i]===CID&&board[i]==="king"){const[kr,kc]=rc(i);ppK.push([kr,kc])}}
     const result=solveWO(R,{prePlaced:pp,prePlacedKings:ppK});
-    console.log("[trySolve] hyp: "+EN[eid]+"@"+cn(wr,wc)+" prePlaced:"+pp.length+" kings:"+ppK.length+" => ok="+result.ok+" steps="+result.steps.length+" reason="+(result.reason||"none"));
+    
     if(!result.ok&&result.steps.length>0){
-      console.log("[trySolve] steps:",result.steps.map(s=>s.tech+":"+s.desc.substring(0,40)).join(" | "));
+      
     }
     return result;
   }
@@ -2853,7 +2985,7 @@ function _computeNextHintInner(){
     for(let i=0;i<S*S;i++){if(R[i]===CID&&board[i]==="king"){const[kr2,kc2]=rc(i);ppK.push([kr2,kc2])}}
     ppK.push([kr,kc]);
     const result=solveWO(R,{prePlaced:pp,prePlacedKings:ppK});
-    console.log("[trySolveK] hyp: King@"+cn(kr,kc)+" prePlaced:"+pp.length+" kings:"+ppK.length+" => ok="+result.ok+" steps="+result.steps.length+" reason="+(result.reason||"none"));
+    
     return result;
   }
 
@@ -2972,7 +3104,7 @@ function _computeNextHintInner(){
               for(const[pr,pc]of eAllK){if(src(vr,vc,pr,pc)||sdg(vr,vc,pr,pc)||tch(vr,vc,pr,pc)){ok=false;break}}
               if(ok){hp=true;break}}
             if(!hp){earlyReason="no King cell can pair with existing King";earlyContra=true;return}}}
-        console.log("[cascade] iter estates: "+Object.keys(cands).filter(e3=>!placedInChain[e3]).map(e3=>EN[e3]+"="+cands[e3].length).join(" "));
+        
         // Naked singles first — place any estate with exactly 1 candidate.
         // This must run before pigeonhole so that cascade placements (e.g. Sand→R3C3)
         // correctly narrow other estates before we test for shared row/col confinement.
@@ -3028,7 +3160,7 @@ function _computeNextHintInner(){
                   if(ok){hp=true;break}}
                 if(!hp){earlyReason="no King cell can pair with existing King";earlyContra=true;return}}}
             prog=true;break}
-          if(cands[e3].length===0){earlyReason=EN[e3]+" runs out of cells";earlyContra=true;console.log("[cascade] WIPEOUT: "+earlyReason+" placed:"+Object.keys(placedInChain).map(x=>EN[x]).join(","));return}}
+          if(cands[e3].length===0){earlyReason=EN[e3]+" runs out of cells";earlyContra=true;return}}
         if(earlyContra)return;
         // Pigeonhole check: after naked singles, two remaining estates confined to same row/col
         // Running here (post naked-singles) ensures cascade placements have already narrowed
@@ -3039,7 +3171,7 @@ function _computeNextHintInner(){
             for(let b=a+1;b<unE.length&&!earlyContra;b++){
               const eb=+unE[b];
               if(ra.size===1&&new Set(cands[eb].map(([r])=>r)).size===1&&[...ra][0]===[...new Set(cands[eb].map(([r])=>r))][0]){
-                earlyReason=EN[ea]+" and "+EN[eb]+" both confined to row "+([...ra][0]+1);earlyContra=true;console.log("[cascade] PIGEONHOLE: "+earlyReason)}
+                earlyReason=EN[ea]+" and "+EN[eb]+" both confined to row "+([...ra][0]+1);earlyContra=true;}
               if(!earlyContra&&ca.size===1&&new Set(cands[eb].map(([,c])=>c)).size===1&&[...ca][0]===[...new Set(cands[eb].map(([,c])=>c))][0]){
                 earlyReason=EN[ea]+" and "+EN[eb]+" both confined to column "+([...ca][0]+1);earlyContra=true}}}}
         if(earlyContra)return;
@@ -3256,13 +3388,13 @@ function _computeNextHintInner(){
             if(!blk){for(const[pr,pc]of allK){if(tch(kr,kc,pr,pc)||sdg(kr,kc,pr,pc)||src(kr,kc,pr,pc)){blk=true;break}}}
             if(!blk)kSurv.push([kr,kc])}
           const need=2-placedKings.length-kingsInChain.length;
-          if(kSurv.length<need){earlyReason=kSurv.length===0?"no valid King cells remain":"only "+kSurv.length+" King cell"+(kSurv.length>1?"s remain":" remains")+" — can\u2019t form a pair";earlyContra=true;console.log("[cascade] KING: "+earlyReason+" kSurv="+kSurv.length+" need="+need);return}
+          if(kSurv.length<need){earlyReason=kSurv.length===0?"no valid King cells remain":"only "+kSurv.length+" King cell"+(kSurv.length>1?"s remain":" remains")+" — can\u2019t form a pair";earlyContra=true;return}
           if(need>=2&&kSurv.length>=2){
             const pairs=[];
             for(let a=0;a<kSurv.length;a++)for(let b=a+1;b<kSurv.length;b++)
               if(!src(...kSurv[a],...kSurv[b])&&!sdg(...kSurv[a],...kSurv[b])&&!tch(...kSurv[a],...kSurv[b]))
                 pairs.push([kSurv[a],kSurv[b]]);
-            if(pairs.length===0){earlyReason=kSurv.length+" King cells survive but none can pair";earlyContra=true;console.log("[cascade] KING: "+earlyReason);return}
+            if(pairs.length===0){earlyReason=kSurv.length+" King cells survive but none can pair";earlyContra=true;return}
             if(pairs.length===1){
               for(const[kr,kc]of pairs[0]){
                 const key=kr+","+kc;
@@ -3290,7 +3422,7 @@ function _computeNextHintInner(){
                     filt(e3,([r3,c3])=>!sdg(r3,c3,kr,kc)&&!tch(r3,c3,kr,kc),-2)}}
                 prog=true;continue}}}}
         if(prog)continue;
-        console.log("[KV] ENTER: kings="+(placedKings.length+kingsInChain.length)+" estates="+Object.keys(cands).filter(e3=>!placedInChain[e3]).map(e3=>EN[e3]).join(","));
+        
         // King Viability: for each unplaced estate candidate,
         // check if placing that queen still allows kings to pair.
         if(placedKings.length+kingsInChain.length<2){
@@ -3323,7 +3455,7 @@ function _computeNextHintInner(){
                 for(let a=0;a<kS.length&&!hp;a++)for(let b=a+1;b<kS.length&&!hp;b++)
                   if(!src(...kS[a],...kS[b])&&!sdg(...kS[a],...kS[b])&&!tch(...kS[a],...kS[b]))hp=true;
               }else{hp=kS.length>0}
-              console.log("[KV] "+EN[e3]+"@"+cn(cr,cc)+": kingSurv="+kS.length+" pairs?="+hp+(kS.length<4?" cells:"+kS.map(([r,c])=>cn(r,c)).join(","):""));if(!hp){
+              if(!hp){
                 // v6.33: Record KV elimination in chain text and ghost visualization
                 // This is a nested hypothesis: "if E went here, kings can't pair"
                 const kvKey=cr+","+cc;
@@ -3337,7 +3469,7 @@ function _computeNextHintInner(){
                 ck(+e3,cr,cc,-2);// provenance: king viability kill
                 cands[e3].splice(ci,1);prog=true}}
             if(cands[e3].length===0){
-              earlyReason=EN[e3]+" has no placement (Kings cannot pair)";earlyContra=true;console.log("[cascade] KV: "+earlyReason);return}
+              earlyReason=EN[e3]+" has no placement (Kings cannot pair)";earlyContra=true;return}
             if(prog)break}
         }
         if(earlyContra)return;
@@ -3520,7 +3652,7 @@ function _computeNextHintInner(){
       
       if(bestKing){
         const kpLabel=bestVictim>=0?EN[bestVictim]+" wiped":"kings can't pair";
-        console.log("[buildSolverGhosts] Sub-hypothesis: King@"+cn(...bestKing)+" → cascade → "+kpLabel);
+        
         const kkey=bestKing[0]+","+bestKing[1];
         if(!seen.has(kkey)){seen.add(kkey);
           solverGhosts.push({r:bestKing[0],c:bestKing[1],cls:"ghost-queen",txt:"♚"});
@@ -3558,7 +3690,7 @@ function _computeNextHintInner(){
       }
     }
     
-    console.log("[buildSolverGhosts] chain:"+chainParts.length+" placed:"+Object.keys(placedInChain).length);
+    
 
     // Step 2C½: Provenance-based relevance filter (v6.33)
     // Uses cellKill map to trace causal chains from contradiction back to hypothesis.
@@ -3745,7 +3877,7 @@ function _computeNextHintInner(){
           chainParts.splice(ci,0,...insTexts);
           ci+=insTexts.length;// skip past inserted entries
           repaired=true;
-          console.log("[chainRepair] Inserted "+insTexts.length+" missing steps before "+cp+": "+insTexts.join(", "));}
+          }
         simQ2.push([pr,pc]);simPlE.add(eId);
       }
       if(repaired){
@@ -3945,7 +4077,7 @@ function _computeNextHintInner(){
         if(!reasonOverride&&!earlyReason)reasonOverride=EN[e2]+" runs out of cells";
         // Use origCands for visualization; if empty, fall back to remCells (uncrossed but effectively dead)
         const visCells=origCands[e2].length?origCands[e2]:remCells(+e2);
-        console.log("[WIPE-VIS] estate="+EN[e2]+" visCells="+visCells.length+" earlyReason="+(earlyReason||"none")+" cells:"+visCells.map(([r,c])=>cn(r,c)).join(","));
+        
         contraFound=true; // estate wiped = contradiction
         for(const[r2,c3]of visCells){
           const key=r2+","+c3;
@@ -4105,7 +4237,7 @@ function _computeNextHintInner(){
       }
     }
     
-    console.log("[buildSolverGhosts] ghosts:",solverGhosts.length,"chain:",chainParts.join(" → "),"contra:"+contraFound,"earlyContra:"+earlyContra);
+    
     
     // Step 6: Fallback — if mini-cascade didn't detect contradiction but full solver did,
     // generate ghosts from the solver's reason. This handles cases where the full solver
@@ -4126,7 +4258,7 @@ function _computeNextHintInner(){
             solverGhosts.push({r:r2,c:c3,cls:"ghost-contra",txt:"✕"})}
           if(!reasonOverride)reasonOverride=hypResult.reason;
           contraFound=true;
-          console.log("[buildSolverGhosts] Step 6 fallback: added "+wipedCells.length+" red markers for "+wipedName);
+          
         }
       }
       // Also check cands for estates the mini-cascade DID wipe but Step 4 missed
@@ -4425,7 +4557,7 @@ function _computeNextHintInner(){
           const key=pos[0]+","+pos[1];
           if(!ghostSeen.has(key)){ghostSeen.add(key);
             newGhosts.push({r:pos[0],c:pos[1],cls:"ghost-queen",txt:"♛"});}
-          console.log("[healChain] inserted missing placement: "+mpPart);}}
+          }}
 
       // Explain each dead candidate until target queen becomes forced
       // Work on a copy so we can apply eliminations iteratively
@@ -4442,7 +4574,7 @@ function _computeNextHintInner(){
             const oCells=simCands[o];
             if(oCells&&oCells.length>0&&oCells.every(([r,c])=>r===dr||c===dc||tch(r,c,dr,dc))){
               newParts.push(EN[eId]+" can\u2019t go at "+cn(dr,dc)+" (blocks "+EN[+o]+")");
-              console.log("[healChain] touch elim: "+EN[eId]+"@"+cn(dr,dc)+" blocks "+EN[+o]);
+              
               workCands=workCands.filter(([r,c])=>r!==dr||c!==dc);
               // Remove from simCands too so next iteration sees updated state
               if(simCands[eId])simCands[eId]=simCands[eId].filter(([r,c])=>r!==dr||c!==dc);
@@ -4464,7 +4596,7 @@ function _computeNextHintInner(){
               const removed=workCands.filter(([r])=>r!==ln);
               if(removed.length>0&&removed.length<before){
                 newParts.push(EN[eId]+" only estate in row "+(ln+1));
-                console.log("[healChain] hidden single: "+EN[eId]+" only in row "+(ln+1));
+                
                 workCands=workCands.filter(([r])=>r===ln);
                 if(simCands[eId])simCands[eId]=workCands.length>0?[...workCands]:simCands[eId];
                 progThisRound=true;}}}
@@ -4476,7 +4608,7 @@ function _computeNextHintInner(){
               const removed=workCands.filter(([,c])=>c!==ln);
               if(removed.length>0&&removed.length<before){
                 newParts.push(EN[eId]+" only estate in col "+(ln+1));
-                console.log("[healChain] hidden single: "+EN[eId]+" only in col "+(ln+1));
+                
                 workCands=workCands.filter(([,c])=>c===ln);
                 if(simCands[eId])simCands[eId]=workCands.length>0?[...workCands]:simCands[eId];
                 progThisRound=true;}}}}
@@ -4491,7 +4623,7 @@ function _computeNextHintInner(){
             const after=workCands.filter(([r])=>r!==row);
             if(after.length<before&&after.length>0){
               newParts.push(EN[+oe]+" confined to row "+(row+1));
-              console.log("[healChain] confinement: "+EN[+oe]+" in row "+(row+1));
+              
               workCands=after;progThisRound=true;}}
           const ocs=new Set(simCands[oe].map(([,c])=>c));
           if(!progThisRound&&ocs.size===1){const col=[...ocs][0];
@@ -4499,7 +4631,7 @@ function _computeNextHintInner(){
             const after=workCands.filter(([,c])=>c!==col);
             if(after.length<before&&after.length>0){
               newParts.push(EN[+oe]+" confined to col "+(col+1));
-              console.log("[healChain] confinement: "+EN[+oe]+" in col "+(col+1));
+              
               workCands=after;progThisRound=true;}}}
         if(progThisRound){propAll();continue;}
 
@@ -4536,7 +4668,7 @@ function _computeNextHintInner(){
             if(!blk)kvKC.push([kr2,kc2]);}
           if(kvKC.length<needK||(needK>=2&&!kvKC.some(([ar,ac],ai)=>kvKC.some(([br,bc],bi)=>bi>ai&&!src(ar,ac,br,bc)&&!sdg(ar,ac,br,bc)&&!tch(ar,ac,br,bc))))){
             newParts.push(EN[eId]+" out of "+cn(dr,dc)+" (kings can\u2019t pair)");
-            console.log("[healChain] KV: "+EN[eId]+"@"+cn(dr,dc)+" → kings can't pair ("+kvKC.length+" cells)");
+            
             workCands=workCands.filter(([r,c])=>r!==dr||c!==dc);
             if(simCands[eId])simCands[eId]=simCands[eId].filter(([r,c])=>r!==dr||c!==dc);
             progThisRound=true;}}
@@ -5053,7 +5185,7 @@ function _computeNextHintInner(){
             healChain(bsg,"queen",wr,wc,eid);
             const cost=cogCost(bsg.chainParts,bsg.reasonEnd);
             const rq=reasonQ(bsg.reasonEnd);
-            console.log("[5b] "+EN[eid]+"@"+cn(wr,wc)+": chain="+bsg.chainParts.length+" cog="+cost+" rq="+rq+" "+bsg.chainParts.join(",")+" → "+bsg.reasonEnd);
+            
             if(isBetter(cost,rq)){
               bestCost=cost;bestRQ=rq;
               // KV wipeout: every cell of victim estate individually breaks king pairing.
@@ -5125,7 +5257,7 @@ function _computeNextHintInner(){
                 const k=vr+","+vc;if(!seen2.has(k)){seen2.add(k);bsg.ghosts.push({r:vr,c:vc,cls:"ghost-cross",txt:"\u2715"})}}}
             const cost=cogCost(bsg.chainParts,bsg.reasonEnd);
             const rq=reasonQ(bsg.reasonEnd);
-            console.log("[5b-K] King@"+cn(kr,kc)+": chain="+bsg.chainParts.length+" cog="+cost+" rq="+rq+" "+bsg.chainParts.join(",")+" → "+bsg.reasonEnd);
+            
             if(isBetter(cost,rq)){
               bestCost=cost;bestRQ=rq;
               const isKVWipeK=bsg.reasonEnd.includes("has no placement");
@@ -5156,7 +5288,7 @@ function _computeNextHintInner(){
                 answer:"Cross "+cn(kr,kc)};
               }// end non-KV king else
               }}}}
-      if(bestHint){console.log("[5b] WINNER: cog="+bestCost+" rq="+bestRQ+" → "+bestHint.nudge);return bestHint}
+      if(bestHint){return bestHint}
     }
 
     // ── PHASE 5c: PLACEMENT — solver says place this piece ──
@@ -5327,14 +5459,21 @@ function _computeNextHintInner(){
 
 function renderHint(){
   const bar=document.getElementById("hintBar");
+  // During tutorial, hide bottom hint bar — tutorial bar shows everything
+  const _tutHide=tutorialMode;
   if(!activeHint){bar.style.display="none";clearHintHighlight();return}
-  bar.style.display="block";
+  bar.style.display=_tutHide?"none":"block";
   const h=activeHint,d=h.detail||1;
   const maxD=h._maxDetail||3;
   const isChain=h._chainParts&&h._chainParts.length>=2;
+  // Strip internal phase tags like [P0], [2b], [2α] from display
+  const _stripTag=t=>t?t.replace(/^\[[^\]]+\]\s*/,""):t;
+  const _nudge=_stripTag(h.nudge);
+  const _reason=_stripTag(h.reason);
+  const _answer=_stripTag(h.answer);
   let cls="hint-bar"+(h.completed?" completed":"");
   let html="";
-  if(h.completed)html+="<div class='hint-check'>✓</div>";
+  const _hIcon=h.completed?"<span class='hint-check'>✓</span>":"💡";
   html+="<div class='hint-text'>";
 
   if(isChain){
@@ -5345,7 +5484,7 @@ function renderHint(){
     const showAnswer=d>=2+nSteps+1;
 
     // Nudge always shown
-    if(d>=1)html+="<div class='hint-nudge'>💡 "+colorizeEstates(h.nudge)+"</div>";
+    if(d>=1)html+="<div class='hint-nudge'>"+_hIcon+" "+colorizeEstates(_nudge)+"</div>";
 
     // Build progressive reason text
     if(d>=2){
@@ -5370,13 +5509,13 @@ function renderHint(){
       }
       html+="<div class='hint-reason'>"+colorizeEstates(reasonText)+"</div>";
     }
-    if(showAnswer)html+="<div class='hint-answer'>→ "+colorizeEstates(h.answer)+"</div>";
+    if(showAnswer)html+="<div class='hint-answer'>→ "+colorizeEstates(_answer)+"</div>";
     if(!h.completed&&d<maxD)html+="<div class='hint-more'>tap 💡 again for more</div>";
   } else {
     // Standard 3-level hint (non-chain or short chain)
-    if(d>=1)html+="<div class='hint-nudge'>💡 "+colorizeEstates(h.nudge)+"</div>";
-    if(d>=2)html+="<div class='hint-reason'>"+colorizeEstates(h.reason)+"</div>";
-    if(d>=3)html+="<div class='hint-answer'>→ "+colorizeEstates(h.answer)+"</div>";
+    if(d>=1)html+="<div class='hint-nudge'>"+_hIcon+" "+colorizeEstates(_nudge)+"</div>";
+    if(d>=2)html+="<div class='hint-reason'>"+colorizeEstates(_reason)+"</div>";
+    if(d>=3)html+="<div class='hint-answer'>→ "+colorizeEstates(_answer)+"</div>";
     if(!h.completed&&d<3)html+="<div class='hint-more'>tap 💡 again for more</div>";
   }
 
@@ -5946,95 +6085,80 @@ function decodePuz(code){code=code.trim();if(code.length!==64)return null;const 
 // ──────────────────────────────────────────────────────────────────
 const PUZZLES = {
 Beginner:[
-"1110000211122222222228883888888834488848554444485566677777777777",
-"0081888182811111828831112288311466884444668885746668557466655774",
-"8822200381122033888223338833333348888333468855334688777747777777",
-"0022221120223311222233338888833488888854885558548667555586675555",
-"1110888811102888111128883333333344333333555533335555667766666777",
-"8888001688888016280000162533333675444666756666667778866677788886",
-"0018888811188882111872223335724438857844385578865857788655577786",
-"0088111128888811288888112238488433384444335574443357777637777766",
-"0001882811118822144488421348884443444445444445556664475577777777",
-"0021111188221181822388888823448882225448825554462288844627788666"
+"3300888132228881333244443388844433884444355844663336666633377666",
+"2200000022113330222233382444333844448888777755888887766888877777",
+"3328888013222880133228803334288534444885644455856664555588645777",
+"8800000088331112833444423344446655846666858666668888666688886677",
+"8888088888110008284443002444433024444466554466665444666655557766",
+"0000001100501111555028885533244855588448558888487888884674444446",
+"2228220011282555222225552222355524443555888855558888765588877655",
+"3388812033111120833114228831842258388442588888447768688477666884",
+"0028888832288818332221113884215138848858388885553855556655557766",
+"3100000031444444344444423484455288844555888455858866558888667788",
 ],
 Easy:[
-"0022222201112882522228885422283354555533555586665588866755588887",
-"0022228211128882331222223332282483352884835558888376686877776668",
-"0000018800000188011111823888844238884444355884467888666677888666",
-"0888811100811111022333118843331178455666788555567887566677777766",
-"1111110421111104211114448333344488444444555488885666888657766666",
-"0001111208811112088888823388882236584444365554746658547766588877",
-"0001888300112883088428338844443388844438554444885446667754444667",
-"0111111101113333044133228844333344448883666888856666888566777777",
-"1128000312288883882888838824888322248883266485576666677766666677",
-"0000223311222233722822337288233374482333788822557888766677777666"
+"0000000022200011222444443444844436488444668888456688884566667788",
+"8888000018880000133334203388842633857426338577667787778677777888",
+"1000000211100442130088421334884488444444855864448888666666666677",
+"0000000041122200444222304443333044400000845588888886668888778888",
+"0000008800011118444122114888883344888835668885556688855566677555",
+"1880000018888830282888342222333466623344688885546685555766555577",
+"8800001128830001288300448833334488888344888855546685555455557755",
+"8888000021811000211133334448333366488355688888576666688766688877",
+"0888888800018888000122223334444244444444555555776667777777777777",
+"1111002241112222433382224333888848888888466666556668866666666777",
 ],
 Medium:[
-"0022221102244881822448838884443384844435844455556684777768877777",
-"0000001130022211333228113333881144758811777588887888886677788886",
-"0000001100001111222111114828331148888888888885555668855755555557",
-"0008888100888831500028385554233855544444555746645777666677888666",
-"8001111180033331882233318553333375544333755555557788866577888855",
-"2000001120008811204883334448883388488533884485336666853377766553",
-"0000155822211455233334852338348533884485333888856668688866666877",
-"2218888022118880223111112338888523384485225555552655555566777775",
-"3388800831188888338822883344555833444555344445554444556677555555",
-"1100000011120044112222441222233412228844855888648866866687766666",
-"2221110022211110222231148883344468444444688554446877444468777448",
-"0001188811111181322881113333881133558446355556663555776677777766",
-"8800228818800288188882283333332834433566444775668777777688887766",
-"1111022211180222118802223338844238888444785866447757666677776666",
-"3000001130222212322222223332222288222224886655548866877788888788",
-"1110000018880000111122441333888473338884775586447666666477666666",
-"0000001100088881233388812333844133338466554444665566666657768666",
-"1111002218888822888882223338822233334442666555226665588266667772",
-"3330000033555881332258813332588833355848355558483665884835555778",
-"6600082261113822613338226333333264333555648777556888877588877777",
-"2222280011228880882228308822223485444444556444445666444456666774",
-"8888800281122222888822228888222344444433464444556644444567777777",
-"0000011100001118244488882334888822344485444466658866666688776666",
-"3388880283111802833338823338888833444888344455553666777733667777",
-"0011188811111888444111224443555548435555688885556666875566677775",
-"3111111038111110322244883555448855558448555888885588686677766666",
-"0000088122000881222338882243338544433555846635588466355887765558",
-"3311100033111102333488823334888863445885637555556677555566778555",
-"0888883301111133112223331888888318854433188555668885556677855668",
-"0000011120331111283311148833584488885844868855448687774488887444"
+"0082211122223314662238848665388486553884665558886667788866677788",
+"1888000018882000888822338888823344445233444556667447566677776666",
+"0008883300881133248888832488888324488863447758664477566647777666",
+"0000011122001181222444882233448833384488588844485886674456666774",
+"1111888018818880888188204331152043655555466558886665555566657755",
+"1111100011111333221133334333333344338885443888854468877744688777",
+"0002222211111222331222225344448855444888555547665857776658877766",
+"0011111182211155822211558822233588448555888885556666675588866755",
+"1100000211888022438888824334452244444552666455556666557566666677",
+"8130002281330022113888223338888453388444553388475883664755337777",
+"0000882200011882000322224833332248888888558856685585566655557766",
+"2222001122888111228881115224443352448837566447775666777766667777",
+"1110000011110000300000223340555888455888888558868785888677777777",
+"2200011122111111421111814333188144433881444885554478766647777766",
+"8888088888800881228038812440338144443851664888516665555166775555",
+"8841100283411102334881123848888888445585888665558886655577866666",
+"2222000188222211388222113888221833348868555486687777886877778666",
+"2888000128888881244888814448553344445533444555536647555366675553",
+"2200111122088811220881134488811344485511688755516887755188777551",
+"0000001188828111382281113228881122224858666648586666888866667788",
+"0088111188881111888855528833355284336557846665878666658766665577",
+"1800002218888002888888023338885263345552666455526666555766555777",
+"0008881428888114228881442288833462888334688583336555333366577733",
+"0022224400222114222221443322244488655444886558888866578866677788",
+"1008822211088822180002228833822244438888444888854446687544466677",
+"1100002211110222122222221138822266388844655555556888888867777778",
+"1110000011888888518388225163884458644444586444445867777758777777",
+"1888820011888222112222231133333344333338488558884885786844857766",
+"2222100622331106223300064433886684438856845555568885566688776666",
+"3388800138888881333222814333311144365555666665556666665577766555",
 ],
 Hard:[
-"1000002211003222448832224483332244448666444486554888866577866665",
-"0011111111111811231888812333888888834447885566875556668755668887",
-"0011222281112222881222228813328888555548888855488668555886667777",
-"1000002213800022338882223388446638888466388584663855886638577768",
-"4881880048813888448338224433388244433882555555585555665577555666",
-"1110000811110028111332288853324888533348885554488885446687754446",
-"1111000011111002418883224888333248883222468835226668557777777777",
-"3333001133330011333882223348888855448888555886868578666688766666",
-"8380021183888211838882225388422658884266555886667758866677766666",
-"0000001100038111283381112833844488884484558544845555748677777786",
-"1118880011111800111118028533333255443336544886664488666677888866",
-"8880011188801111882211113322111533344555366888856666885566666775",
-"2200001122333314222333442233334428835444888355448665554866667778",
-"2221110022244110228844332888443325554438655558886887778788877777",
-"8888000311222003444223334844333348543883885538888855388687777866",
-"0001122238111228381822883888425844444458666445556666655566666777",
-"8888800081111000211130342211333488818884885588886655887766555577",
-"1111008811111288111182227733888277558842755554447666688876666668",
-"2000888122888811222248112244433622544436555446667777666677777666",
-"2200011172288811782888117888344478883444758833647588366678883366"
+"1111100011118220555888223358888888544486885468868855666687766666",
+"0082218808882118088222885558422358884423555884436558884467777777",
+"8000011180002818443228884438888844488855444688754446877744477777",
+"1100222211222223112228835128888358888433558884665587746655777788",
+"3002111130021111333244413384444463855444668854846666578866677778",
+"8880002211000222440022334403333344588888665688886666687866666878",
+"1111300811113888122138887222388877725544877555448766855587888888",
+"1000002212222222133222223333244533344455688884556688447566888777",
+"0022222281122222888322248883224477882244878855447788556477775566",
+"8822100188211111882211118821183348111833455518376668787788887777",
 ],
 Expert:[
-"2111000022110888222008888888888388844833855546635557466677778866",
-"1100044412223344122238842283338466888544668885546686557766667777",
-"1122000012222880222288882228888322448583664455586667755886677755",
-"2222000011222000111222243355544488885444885555558866588888887788",
-"8888000311888833882233337888433377844433775544337754444677774446",
-"1110038811223388182833881888438318884333168777557677755577777777",
-"1100888218888222188822331182243355582463555826635588866677786666",
-"8001111188822111882222318222233384555338845555336665557366655577",
-"2008888122288111228881132888443322444444566647875666677755667777",
-"8211000022111100222113302223333342338336444586667775888677788886"
-]
+"1113380011223888688233336888833368885544688855546888554488777744",
+"2211180823381808238888883338888863385544666655446667744466677774",
+"1110000011118882131822221348888263444882664445226667757766777777",
+"2000001122888881228888116244883366648853666485556664555588647755",
+"1000002211002222313322223338844238888444688855446885577766677777",
+],
 };
 
 
@@ -6043,7 +6167,7 @@ Expert:[
 // ──────────────────────────────────────────────────────────────────
 
 // ═══ PROGRESS TRACKING ═══
-const STORAGE_KEY = "estate-puzzle-progress-v46"; // v44: 80 puzzles (10B/10E/30M/20H/10X) sorted easy→hard within tiers
+const STORAGE_KEY = "estate-puzzle-progress-v48"; // v44: 65 puzzles (10B/10E/30M/20H/10X) sorted easy→hard within tiers
 let progress = {};
 let currentDiff = "Beginner";
 let currentIdx = -1;
@@ -6078,10 +6202,12 @@ function onDiffChange(diff) {
   if(tutorialMode)return;
   currentDiff = diff;
   currentPage = 0;
-  renderSelector();
-  // Auto-load first puzzle of page
+  // Auto-select first unsolved puzzle, or first if all solved
   const codes = PUZZLES[currentDiff] || [];
-  if (codes.length > 0) loadPuzzle(currentDiff, currentPage * PAGE_SIZE);
+  let pick = 0;
+  for(let i=0;i<codes.length;i++){if(!isPuzzleSolved(currentDiff,i)){pick=i;break}}
+  currentIdx = pick;
+  renderSelector();
 }
 function onPuzPageChange(val) {
   currentPage = parseInt(val) || 0;
@@ -6089,64 +6215,50 @@ function onPuzPageChange(val) {
 }
 
 function renderSelector(){
-  const diffSel = document.getElementById("diffSelect");
-  // Difficulty dropdown
-  diffSel.innerHTML = "";
-  for (const diff of Object.keys(PUZZLES)) {
-    const cnt = PUZZLES[diff].length;
-    const solved = getSolvedCount(diff);
-    const opt = document.createElement("option");
-    opt.value = diff;
-    opt.textContent = diff + " (" + solved + "/" + cnt + ")";
-    if (diff === currentDiff) opt.selected = true;
-    diffSel.appendChild(opt);
+  // Build tier tabs
+  const strip=document.getElementById("tierStrip");
+  if(strip){
+    strip.innerHTML="";
+    for(const diff of Object.keys(PUZZLES)){
+      const cnt=PUZZLES[diff].length;
+      const solved=getSolvedCount(diff);
+      const btn=document.createElement("button");
+      btn.className="ttab"+(diff===currentDiff?" on":"");
+      btn.innerHTML='<span class="tname">'+diff+'</span><span class="cnt">'+solved+'/'+cnt+'</span>';
+      btn.onclick=()=>onDiffChange(diff);
+      strip.appendChild(btn);
+    }
   }
   renderPuzGrid();
 }
 function renderPuzGrid(){
-  const puzSel = document.getElementById("puzSelect");
-  const grid = document.getElementById("puzGrid");
-  puzSel.innerHTML = "";
-  grid.innerHTML = "";
-  const codes = PUZZLES[currentDiff] || [];
-  if (codes.length === 0) return;
-  const totalPages = Math.ceil(codes.length / PAGE_SIZE);
-  // Page range dropdown
-  for (let p = 0; p < totalPages; p++) {
-    const start = p * PAGE_SIZE;
-    const end = Math.min(start + PAGE_SIZE, codes.length);
-    // Check if all in this page are solved
-    let allSolved = true;
-    for (let i = start; i < end; i++) { if (!isPuzzleSolved(currentDiff, i)) { allSolved = false; break; } }
-    const opt = document.createElement("option");
-    opt.value = p;
-    opt.textContent = (start + 1) + "–" + end + (allSolved ? " ✓" : "");
-    if (p === currentPage) opt.selected = true;
-    puzSel.appendChild(opt);
-  }
-  // Puzzle buttons for current page
-  const pageStart = currentPage * PAGE_SIZE;
-  const pageEnd = Math.min(pageStart + PAGE_SIZE, codes.length);
-  for (let i = pageStart; i < pageEnd; i++) {
-    const btn = document.createElement("div");
-    btn.className = "puz-btn";
-    if (isPuzzleSolved(currentDiff, i)) btn.classList.add("solved");
-    if (currentIdx === i && currentDiff === (puz ? puz._diff : "")) btn.classList.add("active");
-    btn.textContent = i + 1;
-    btn.onclick = () => loadPuzzle(currentDiff, i);
+  const grid=document.getElementById("puzGrid");
+  grid.innerHTML="";
+  const codes=PUZZLES[currentDiff]||[];
+  if(codes.length===0)return;
+  // Show ALL puzzles (no pagination)
+  for(let i=0;i<codes.length;i++){
+    const btn=document.createElement("div");
+    btn.className="puz-btn";
+    if(isPuzzleSolved(currentDiff,i))btn.classList.add("solved");
+    if(currentIdx===i)btn.classList.add("active");
+    btn.textContent=i+1;
+    btn.onclick=()=>{currentIdx=i;renderPuzGrid()};
     grid.appendChild(btn);
   }
-  // Progress bar
-  const total = codes.length;
-  const solved = getSolvedCount(currentDiff);
-  const pct = total ? Math.round(solved / total * 100) : 0;
-  const diffColor = {Beginner:"#06b6d4",Easy:"#16a34a",Medium:"#f59e0b",Hard:"#ef4444",Expert:"#9333ea"}[currentDiff] || "#06b6d4";
-  document.getElementById("progFill").style.width = pct + "%";
-  document.getElementById("progFill").style.background = diffColor;
-  document.getElementById("progText").textContent = solved + "/" + total + " solved";
+  // Progress
+  const total=codes.length;
+  const solved=getSolvedCount(currentDiff);
+  const pct=total?Math.round(solved/total*100):0;
+  document.getElementById("progFill").style.width=pct+"%";
+  document.getElementById("progText").textContent=solved+"/"+total;
+  // Update play button label
+  const playBtn=document.getElementById("selPlayBtn");
+  if(playBtn){
+    const idx=currentIdx>=0?currentIdx:0;
+    playBtn.querySelector(".sel-play-label").textContent="Play #"+(idx+1);
+  }
 }
-
-// ═══ LOAD PUZZLE ═══
 function loadPuzzle(diff,idx){
   if(tutorialMode&&!(diff==="Beginner"&&idx===0))return;
   const codes=PUZZLES[diff]||[];
@@ -6178,13 +6290,18 @@ function loadPuzzle(diff,idx){
   rn.dl=cp.dl;
   // King-deco display flag
   const kingDeco=kingDecoRaw&&rn.dl!=='Beginner';
-  currentDiff=diff;currentIdx=idx;currentPage=Math.floor(idx/PAGE_SIZE);puzzleSolved=false;
+  currentDiff=diff;currentIdx=idx;currentPage=0;puzzleSolved=false;
+  // Update play screen labels
+  const _pt=document.getElementById("playTier");if(_pt)_pt.textContent=diff;
+  const _pn=document.getElementById("playNum");if(_pn)_pn.textContent="#"+(idx+1);
   puz={R,_diff:diff,_idx:idx,_probe:rn,_l1:l1,_pureQ:pureQ,_kingDeco:kingDeco,_kingDecoRaw:kingDecoRaw};
   board=Array(S*S).fill(null);hist=[];si=-1;moveLog=[];startTime=Date.now();undoCount=0;hintCount=0;
   activeHint=null;hintFocusEid=-1;renderHint();
   rNew=rn;sr=rNew; // sr may be null if v1 can't solve (hints Phase 0-4 still work)
   renderBoard();
   renderSelector();
+  if(!_initLoad)goPlay();
+  _initLoad=false;
 }
 
 // ═══ WIN DETECTION ═══
@@ -6230,10 +6347,9 @@ function onWin(){
   const mins=Math.floor(elapsed/60000);
   const timeStr=mins>0?mins+"m "+(Math.round((elapsed%60000)/1000))+"s":secs+"s";
   document.getElementById("winMsg").textContent=currentDiff+" #"+(currentIdx+1);
-  document.getElementById("winTime").textContent="⏱ "+timeStr;
-  document.getElementById("winStats").innerHTML=
-    "<span>💡 Hints: <span class='stat-val'>"+hintCount+"</span></span>"+
-    "<span>↩ Undos: <span class='stat-val'>"+undoCount+"</span></span>";
+  document.getElementById("winTime").textContent=timeStr;
+  document.getElementById("winHints").textContent=hintCount;
+  document.getElementById("winUndos").textContent=undoCount;
   document.getElementById("winOverlay").classList.add("show");
 }
 function closeWin(){document.getElementById("winOverlay").classList.remove("show")}
@@ -6268,14 +6384,14 @@ function toggleTheme(){
   const html=document.documentElement;
   const isLight=html.getAttribute('data-theme')==='light';
   html.setAttribute('data-theme',isLight?'dark':'light');
-  document.getElementById('themeToggle').textContent=isLight?'🌙':'☀️';
+  document.getElementById('themeToggle').textContent=isLight?'☽':'☀';
   try{localStorage.setItem('estate-theme',isLight?'dark':'light')}catch(e){}
   if(puz)renderBoard();renderHint();
 }
 function initTheme(){
   try{const t=localStorage.getItem('estate-theme');
     if(t==='light'){document.documentElement.setAttribute('data-theme','light');
-      document.getElementById('themeToggle').textContent='☀️'}}catch(e){}
+      document.getElementById('themeToggle').textContent='☀'}}catch(e){}
 }
 
 
@@ -6353,6 +6469,8 @@ function getTutNarration(hint){
   // Specific hint description
   out+="<b>💡 "+nudgeColored+"</b>";
   if(reasonColored)out+=" — "+reasonColored;
+  // Answer line (action to take)
+  if(hint.answer)out+="<br><b style='color:var(--t0)'>→ "+colorizeEstates(hint.answer)+"</b>";
   // Placement instructions for actionable hints
   if(hint.targets&&hint.targets.some(t=>t.type==="queen"||t.type==="king")){
     const pl=hint.targets.find(t=>t.type==="queen"||t.type==="king");
@@ -6439,7 +6557,9 @@ function renderTutorial(){
   }else if(tutPhase==="hints"){
     imgOv.classList.remove("active");
     if(!activeHint||activeHint.completed){
-      msg.innerHTML="Press <b style='color:#f59e0b'>💡 Hint</b> to find the next logical step.";
+      msg.innerHTML=activeHint&&activeHint.completed?
+        "<span class='hint-check'>✓</span> Done! Press <b style='color:var(--copper)'>💡 Hint</b> for the next step.":
+        "Press <b style='color:var(--copper)'>💡 Hint</b> to find the next logical step.";
       stepLbl.textContent="💡";
       nextBtn.style.display="none";
     }else{
@@ -6463,10 +6583,46 @@ function tutOnHintCompleted(){
   renderTutorial();
 }
 
+
+// ═══ SCREEN TRANSITIONS ═══
+function goPlay(){
+  document.getElementById("selScr").className="screen off-l";
+  document.getElementById("playScr").className="screen play-screen on";
+}
+function goSel(){
+  document.getElementById("selScr").className="screen on";
+  document.getElementById("playScr").className="screen play-screen off-r";
+  renderSelector();
+}
+// Timer
+var _timerInterval=null;
+function startTimer(){
+  if(_timerInterval)clearInterval(_timerInterval);
+  const el=document.getElementById("timerDisp");
+  _timerInterval=setInterval(()=>{
+    if(!startTime||puzzleSolved)return;
+    const e=Math.floor((Date.now()-startTime)/1000);
+    const m=Math.floor(e/60),s=e%60;
+    if(el)el.textContent=m+":"+(s<10?"0":"")+s;
+  },1000);
+}
+startTimer();
+
+// Hint sheet toggle
+function toggleHintSheet(){
+  document.getElementById("hintSheet").classList.toggle("on");
+  document.getElementById("hintSheetBack").classList.toggle("on");
+}
+function closeHintSheet(){
+  document.getElementById("hintSheet").classList.remove("on");
+  document.getElementById("hintSheetBack").classList.remove("on");
+}
+
 // ═══ INIT ═══
 loadProgress();
 renderSelector();
 initTheme();
+var _initLoad=true;
 // URL parameters: ?d=Beginner&p=1 (1-indexed)
 {const params=new URLSearchParams(window.location.search);
 const urlDiff=params.get("d"),urlPuz=params.get("p");
@@ -6481,6 +6637,7 @@ if(urlDiff&&PUZZLES[urlDiff]&&urlPuz){
     setTimeout(()=>{if(!tutorialMode)startTutorial()},300);
   }}catch(e){}
 }}
+
 </script>
 </body>
 </html>
