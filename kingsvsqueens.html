@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Kings vs Queens demo</title>
+<title>Kings vs Queens v8</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -34,22 +34,22 @@
   --serif:'Crimson Pro',Georgia,serif;--sans:'Outfit',system-ui,sans-serif;
 }
 [data-theme="light"]{
-  --ink:#d0ccc6;--s0:#e8e4dc;--s1:#f2efe8;--s2:#ddd9d2;--s3:#cec8c0;
-  --b0:#c4beb6;--b1:#a89e94;--b2:#8a7e72;
-  --t0:#1a1714;--t1:#44392e;--t2:#6e6458;--t3:#a89e90;
-  --copper:#a07040;--copper-l:#b88050;--copper-dim:rgba(160,112,64,.10);--copper-glow:rgba(160,112,64,.2);
-  --green:#4a7a4a;--green-dim:rgba(74,122,74,.10);
-  --red:#a04848;--red-dim:rgba(160,72,72,.10);
-  --egray:#b8b4ae;
+  --ink:#a09888;--s0:#b0a898;--s1:#bab2a2;--s2:#a89e90;--s3:#9e9486;
+  --b0:#968c80;--b1:#807668;--b2:#6a6054;
+  --t0:#1a1714;--t1:#302820;--t2:#504840;--t3:#807668;
+  --copper:#a07040;--copper-l:#b88050;--copper-dim:rgba(160,112,64,.14);--copper-glow:rgba(160,112,64,.25);
+  --green:#4a7a4a;--green-dim:rgba(74,122,74,.12);
+  --red:#a04848;--red-dim:rgba(160,72,72,.12);
+  --egray:#8a8478;
   --region-border:rgba(0,0,0,.3);
-  --king-color:#1a1714;
-  --accent:#a07040;--accent-dim:rgba(160,112,64,.10);--accent-glow:rgba(160,112,64,.1);
-  --bg-primary:#e8e4dc;--bg-card:#f2efe8;--bg-hover:#ddd9d2;
-  --border-subtle:#c4beb6;--border-mid:#a89e94;
-  --text-primary:#1a1714;--text-secondary:#44392e;--text-muted:#a89e90;
+  --king-color:#b0a898;
+  --accent:#a07040;--accent-dim:rgba(160,112,64,.14);--accent-glow:rgba(160,112,64,.12);
+  --bg-primary:#b0a898;--bg-card:#bab2a2;--bg-hover:#a89e90;
+  --border-subtle:#968c80;--border-mid:#807668;
+  --text-primary:#1a1714;--text-secondary:#302820;--text-muted:#807668;
   --overlay-bg:rgba(0,0,0,.4);
-  --cross-estate:rgba(0,0,0,.25);--cross-castle:rgba(0,0,0,.3);
-  --grid-border:#a89e94;--grid-bg:#e8e4dc;
+  --cross-estate:rgba(0,0,0,.32);--cross-castle:rgba(255,255,255,.35);
+  --grid-border:#807668;--grid-bg:#b0a898;
 }
 
 /* ═══ BASE ═══ */
@@ -128,7 +128,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;o
 .top-timer{font-size:11px;color:var(--t3);font-weight:500;font-variant-numeric:tabular-nums;margin-left:auto}
 .top-sep{width:1px;height:10px;background:var(--b0);flex-shrink:0}
 .top-ct{font-size:11px;font-weight:500}
-.top-ct.qc{color:#d4be8a}
+.top-ct.qc{color:#c4956a}
 .top-ct.kc{color:var(--t1)}
 .btn-theme{background:none;border:1px solid var(--b1);color:var(--t3);font-size:12px;
   width:28px;height:28px;border-radius:6px;cursor:pointer;display:flex;align-items:center;
@@ -192,10 +192,10 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;o
 .pc{line-height:1;position:relative;z-index:3;pointer-events:none;
   font-family:'Segoe UI Symbol','Apple Color Emoji','Noto Sans Symbols 2',serif;
   -webkit-text-size-adjust:100%;text-size-adjust:100%}
-.queen-pc{color:var(--copper);font-size:clamp(18px,calc(var(--cell)*.575),32px);
-  text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.queen-pc{color:#c4956a;font-size:clamp(18px,calc(var(--cell)*.575),32px);
+  text-shadow:0 1px 2px rgba(0,0,0,.5);transform:scaleX(1.2)}
 .king-pc{color:var(--king-color);font-size:clamp(18px,calc(var(--cell)*.575),32px);
-  text-shadow:0 1px 2px rgba(0,0,0,.5)}
+  text-shadow:0 1px 2px rgba(0,0,0,.5);transform:scaleX(1.2)}
 .cross-pc{color:var(--cross-estate);font-weight:700;font-size:clamp(20px,calc(var(--cell)*.53),28px)}
 .cell[data-e="8"] .cross-pc{color:var(--cross-castle)}
 
@@ -317,10 +317,10 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;o
 .tut-btn{background:transparent;border:2px solid var(--copper);color:var(--copper);border-radius:8px;
   padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:all .15s;white-space:nowrap}
 .tut-btn:hover{background:var(--copper-dim)}
-[data-theme="light"] .tut-bar{background:linear-gradient(135deg,#fef9ec,#fef3cd);border-color:var(--copper)}
+[data-theme="light"] .tut-bar{background:linear-gradient(135deg,#c0b8a8,#b8ae9c);border-color:var(--copper)}
 [data-theme="light"] .tut-msg{color:var(--t0)}
 [data-theme="light"] .tut-msg b{color:var(--copper)}
-[data-theme="light"] .tut-img-overlay{background:rgba(255,255,255,.88)}
+[data-theme="light"] .tut-img-overlay{background:rgba(160,152,136,.92)}
 
 /* ═══ SOLVER STEPS (collapsible) ═══ */
 details{background:var(--bg-card);border-radius:10px;margin:8px 16px;box-shadow:var(--shadow-sm)}
